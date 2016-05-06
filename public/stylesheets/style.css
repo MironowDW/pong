@@ -3,6 +3,19 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-a {
-  color: #00B7FF;
+.scene {
+    position: relative;
+    display: table;
+    margin: 0 auto;
+}
+
+.scene .score {
+    position: absolute;
+    right: -65px;
+    font-size: 50px;
+    font-weight: bold;
+}
+
+.scene .score.bottom {
+    bottom: 0;
 }

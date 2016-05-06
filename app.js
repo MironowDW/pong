@@ -6,14 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var vhost = require('vhost');
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
-
-//var vhost = vhost('pong.local', express.static('public'));
-
 var app = express();
-
-//app.use(vhost);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -27,7 +20,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
+var newGame = require('./routes/new_game');
+var game = require('./routes/game');
+
+app.use(newGame);
+app.use(game);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

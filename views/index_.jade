@@ -2,7 +2,7 @@ extends layout
 
 block content
     script(type='text/javascript').
-        var socket = io.connect('http://pong.local:3030');
+        var socket = io.connect('http://127.0.0.1:3030');
 
         socket.on('start_game', function (data) {
             var renderScene = function () {
