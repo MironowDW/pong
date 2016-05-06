@@ -1,0 +1,135 @@
+extends layout
+
+block content
+    script(type='text/javascript').
+        var socket = io.connect('http://pong.local:3030');
+
+        socket.on('start_game', function (data) {
+            var renderScene = function () {
+                context.fillStyle = "#000000";
+                context.fillRect(0, 0, config.width, config.height);
+                player1.render();
+                player2.render();
+                ball.render();
+            };
+
+            /**
+             * Объект плашки, базовый для Computer и Player
+             */
+            function Paddle(x, y, width, height, id) {
+                this.id = id;
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+                this.x_speed = 0;
+                this.y_speed = 0;
+            }
+
+            Paddle.prototype.render = function () {
+                context.fillStyle = "#FFFFFF";
+                context.fillRect(this.x, this.y, this.width, this.height);
+            };
+
+            Paddle.prototype.move = function (x, y) {
+                this.x += x;
+                this.y += y;
+                this.x_speed = x;
+                this.y_speed = y;
+                if (this.x < 0) {
+                    this.x = 0;
+                    this.x_speed = 0;
+                } else if (this.x + this.width > 400) {
+                    this.x = 400 - this.width;
+                    this.x_speed = 0;
+                }
+            };
+
+            function Player(x, y, width, height, id) {
+                this.paddle = new Paddle(x, y, width, height, id);
+            }
+
+            Player.prototype.render = function () {
+                this.paddle.render();
+            };
+
+            function Ball(x, y) {
+                this.x = x;
+                this.y = y;
+                this.x_speed = 0;
+                this.y_speed = 3;
+            }
+
+            Ball.prototype.render = function () {
+                context.beginPath();
+                context.arc(this.x, this.y, 5, 2 * Math.PI, false);
+                context.fillStyle = "#FFFFFF";
+                context.fill();
+            };
+
+            var config = {
+                width: 400,
+                height: 600
+            };
+            var context = getCanvasContext(config);
+
+            var player1 = new Player(175, 580, 50, 10, data.player1Id);
+            var player2 = new Player(175, 10, 50, 10, data.player2Id);
+
+            var ball = new Ball(200, 300);
+
+            renderScene();
+
+            socket.on('ball_move', function (data) {
+                ball.x = data.x;
+                ball.y = data.y;
+
+                renderScene();
+            });
+
+            socket.on('paddle_move', function (data) {
+                var paddle;
+
+                if (data.id == player1.paddle.id) {
+                    paddle = player1.paddle;
+                }
+
+                if (data.id == player2.paddle.id) {
+                    paddle = player2.paddle;
+                }
+
+                if (paddle) {
+                    paddle.x = data.x;
+                    paddle.y = data.y;
+                }
+            });
+
+            function getCanvasContext(config) {
+                var canvas = document.createElement("canvas");
+
+                canvas.width = config.width;
+                canvas.height = config.height;
+
+                document.body.appendChild(canvas);
+
+                return canvas.getContext('2d');
+            }
+
+            window.addEventListener("keydown", function (event) {
+                if (event.keyCode == 37) {
+                    socket.emit('paddle_left', socket.id);
+                }
+                if (event.keyCode == 39) {
+                    socket.emit('paddle_right', socket.id);
+                }
+            });
+
+            window.addEventListener("keyup", function (event) {
+                if (event.keyCode == 37) {
+                    socket.emit('paddle_left_stop', socket.id);
+                }
+                if (event.keyCode == 39) {
+                    socket.emit('paddle_right_stop', socket.id);
+                }
+            });
+        });
