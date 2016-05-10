@@ -1,4 +1,8 @@
-var io = require('socket.io').listen(3030);
+var http = require('http');
+var io = require('socket.io');
+var server = http.createServer();
+server.listen(3030, '185.26.120.161');
+var io = io.listen(server);
 
 var games = {};
 
@@ -8,7 +12,7 @@ io.sockets.on('connection', function (socket) {
         throw 'Не найден referer';
     }
 
-    var gameId = referer.match(/\/game\/([0-9a-zA-Z]+)\//)[1];
+    var gameId = referer.match(/\/game\/([0-9a-zA-Z_-]+)\//)[1];
     if (!gameId) {
         throw 'Не найден gameId';
     }
@@ -21,6 +25,9 @@ io.sockets.on('connection', function (socket) {
     var player = new Player(socket);
 
     game.addPlayer(player);
+
+    console.log(game.player1 == null);
+    console.log(game.player2 == null);
 
     registerOn(socket, game, player);
 
@@ -86,13 +93,17 @@ function Game(id) {
 
         if (this.player1 == null) {
             this.player1 = player;
+            
+	    console.log('Added player 1: ' + player.socket.id);
 
-            this.player1.paddle.y = (this.config.height - (this.config.margin + this.config.paddleHeight));
+	    this.player1.paddle.y = (this.config.height - (this.config.margin + this.config.paddleHeight));
             return;
         }
 
         if (this.player2 == null) {
             this.player2 = player;
+
+	    console.log('Added player 2: ' + player.socket.id);
 
             this.player2.paddle.y = this.config.margin;
             return;
@@ -125,7 +136,7 @@ function Game(id) {
     };
 
     this.isReady = function () {
-        return this.player1 && this.player2;
+        return this.player1 != null && this.player2 != null;
     };
 
     this.tick = function () {
