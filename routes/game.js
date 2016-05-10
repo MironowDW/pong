@@ -26,9 +26,6 @@ io.sockets.on('connection', function (socket) {
 
     game.addPlayer(player);
 
-    console.log(game.player1 == null);
-    console.log(game.player2 == null);
-
     registerOn(socket, game, player);
 
     if (game.isReady()) {
@@ -60,8 +57,10 @@ function registerOn(socket, game, player) {
 }
 
 module.exports = require('express').Router().get('/game/:name/', function (req, res) {
-    var game = new Game(req.params.name);
-    games[game.id] = game;
+    if (!games[req.params.name]) {
+        var game = new Game(req.params.name);
+        games[game.id] = game;
+    }
 
     res.render('game');
 });
@@ -93,17 +92,13 @@ function Game(id) {
 
         if (this.player1 == null) {
             this.player1 = player;
-            
-	    console.log('Added player 1: ' + player.socket.id);
 
-	    this.player1.paddle.y = (this.config.height - (this.config.margin + this.config.paddleHeight));
+	        this.player1.paddle.y = (this.config.height - (this.config.margin + this.config.paddleHeight));
             return;
         }
 
         if (this.player2 == null) {
             this.player2 = player;
-
-	    console.log('Added player 2: ' + player.socket.id);
 
             this.player2.paddle.y = this.config.margin;
             return;
