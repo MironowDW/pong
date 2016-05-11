@@ -1,3 +1,5 @@
+var host = process.env.HOST || '127.0.0.1';
+
 var http = require('http');
 var io = require('socket.io');
 var server = http.createServer();
