@@ -1,7 +1,7 @@
 var http = require('http');
 var io = require('socket.io');
 var server = http.createServer();
-server.listen(3030, '185.26.120.161');
+server.listen(3030, host);
 var io = io.listen(server);
 
 var games = {};
@@ -62,7 +62,7 @@ module.exports = require('express').Router().get('/game/:name/', function (req, 
         games[game.id] = game;
     }
 
-    res.render('game');
+    res.render('game', {host: host});
 });
 
 function Game(id) {
