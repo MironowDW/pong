@@ -184,8 +184,12 @@ function Game(id) {
     };
 
     this.emit = function (event, data) {
-        this.player1.socket.emit(event, data);
-        this.player2.socket.emit(event, data);
+        if (this.player1) {
+            this.player1.socket.emit(event, data);
+        }
+        if (this.player2) {
+            this.player2.socket.emit(event, data);
+        }
     };
 }
 
