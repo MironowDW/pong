@@ -145,7 +145,7 @@ function Game(id) {
         this.player2.update();
         this.ball.update(this.player1, this.player2);
 
-        if (this.player1.score == 10 || this.player2.score == 10) {
+        if (this.player1.score == 11 || this.player2.score == 11) {
             this.stop();
         }
 
