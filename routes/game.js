@@ -240,7 +240,10 @@ Player.prototype.update = function () {
 
     if (this.startRight) {
         this.paddle.move(4, 0);
+        return;
     }
+
+    this.paddle.move(0, 0);
 };
 
 function Ball(x, y) {
