@@ -63,8 +63,12 @@ block script
     }
 
     function updateScene (state) {
-        document.getElementsByClassName('score top')[0].textContent = state.player1.score;
-        document.getElementsByClassName('score bottom')[0].textContent = state.player2.score;
+        document.getElementsByClassName('score bottom')[0].textContent = state.player1.score;
+        document.getElementsByClassName('score top')[0].textContent = state.player2.score;
+
+        if (state.player1.score == 10 || state.player2.score == 10) {
+            alert('Кто-то победил!');
+        }
 
         context.fillStyle = "#000000";
         context.fillRect(0, 0, startState.width, startState.height);

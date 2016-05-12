@@ -145,6 +145,10 @@ function Game(id) {
         this.player2.update();
         this.ball.update(this.player1, this.player2);
 
+        if (this.player1.score == 10 || this.player2.score == 10) {
+            this.stop();
+        }
+
         this.emit('tick', this.getState(false));
 
         var game = this;
