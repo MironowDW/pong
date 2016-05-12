@@ -68,6 +68,7 @@ block script
 
         if (state.player1.score == 10 || state.player2.score == 10) {
             alert('Кто-то победил!');
+            socket.destroy();
         }
 
         context.fillStyle = "#000000";
