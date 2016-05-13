@@ -234,12 +234,12 @@ function Player(socket) {
 Player.prototype.update = function () {
 
     if (this.startLeft) {
-        this.paddle.move(-4, 0);
+        this.paddle.move(-8, 0);
         return;
     }
 
     if (this.startRight) {
-        this.paddle.move(4, 0);
+        this.paddle.move(8, 0);
         return;
     }
 
