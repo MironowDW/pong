@@ -1,0 +1,56 @@
+extends ../layout
+
+block content
+  div.row
+    div.col-sm-3
+      div.card
+        div.card-block
+          h4.card-title.m-0 Пользователи онлайн
+        ul.list-group.list-group-flush
+          li.list-group-item 1
+          li.list-group-item 2
+    div.col-sm-6
+      div.card
+        div.card-block
+          h4.card-title.m-0 Кто ты?
+        div.card-block
+          div.form-group.row
+            label.col-2.col-form-label Ник
+            div.col-10
+              input.form-control(type="text", value="#{name}")
+          div.form-group.row.avatar-select
+            label.col-2.col-form-label Аватарка
+            div.col-10(style="text-align:center")
+              div.row
+                each avatarShow, key in avatarsShow
+                  a.col-3.mb-3.avatar(href="#" onclick="selectAvatar(event, this)" class=(key == 0) ? 'btn-info' : '')
+                    img.card-img-top(src=avatarShow, style="height: 100px; width: 100px; display: block;margin:auto")
+              div.collapse#avatarsCollapse
+                div.row
+                  each avatarHide in avatarsHide
+                    a.col-3.mb-3.avatar(href="#" onclick="selectAvatar(event, this)")
+                      img.card-img-top(src=avatarHide, style="height: 100px; width: 100px; display: block;margin:auto")
+              a.btn.text-muted(data-toggle="collapse" href="#avatarsCollapse" aria-expanded="false" aria-controls="avatarsCollapse") Все аватарочки
+          div.form-group.row
+            div.offset-sm-2.col-sm-10
+              a.btn.btn-primary(href="#") Сохранить
+    div.col-sm-3
+      div.card
+        div.card-block
+          h4.card-title.m-0 Игры
+        ul.list-group.list-group-flush
+          li.list-group-item 1
+          li.list-group-item 2
+        div.card-block
+          a.card-link(href="#") Создать
+
+block script
+  script(type='text/javascript').
+    function selectAvatar(event, avatar) {
+        event.preventDefault();
+
+
+
+        $(".avatar-select .avatar").removeClass("btn-info");
+        $(avatar).addClass("btn-info");
+    }

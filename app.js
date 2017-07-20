@@ -16,8 +16,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
+var state = require('./src/state');
 var site = require('./src/controller/site');
+
+// Глобальное состояние, все объекты будут храниться тут
+app.set('state', new state());
 
 app.get('/', site.index);
 
