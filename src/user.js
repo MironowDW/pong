@@ -21,25 +21,23 @@ exports.init = function (request, response, next) {
 };
 
 exports.initSocket = function (socket, state) {
-    socket.on('user.save', function (data, callback) {
+    socket.on('user.save', function (data) {
         if (!data.name && !data.avatar) {
-            callback({type: 'error', message: 'Нечего сохранять'});
+            // callback({type: 'error', message: 'Нечего сохранять'});
             return;
         }
 
         var hash = state.getHashBySocketId(socket.id);
         if (!hash) {
-            callback({type: 'error', message: 'Пользователь не найден'});
+            //callback({type: 'error', message: 'Пользователь не найден'});
             return;
         }
 
         state.updateUser(hash, data);
 
-        callback({type: 'success', message: 'Сохранено'});
+        //callback({type: 'success', message: 'Сохранено'});
 
         console.log('User saved', data);
-
-
     });
 };
 

@@ -1,0 +1,76 @@
+extends ../layout
+
+block content
+  div.row
+    div.col-sm-3
+      div.card
+        div.card-block
+          h4.card-title.m-0 Пользователи онлайн
+        ul.list-group.list-group-flush
+          each user in users
+            li.list-group-item(id='user_' + user.id)
+              img.avatar(src=user.avatar height="30px")
+              span.name #{user.getName()}
+    div.col-sm-6
+      div.card
+        div.card-block
+          h4.card-title.m-0 Новая игра
+        div.card-block
+          div.form-group.row
+            label.col-2.col-form-label Ник
+            div.col-10
+              input.form-control(type="text", name="name", value="#{name}")
+          div.form-group.row.avatar-select
+            label.col-2.col-form-label Аватарка
+            div.col-10(style="text-align:center")
+              div.row
+                each avatarShow, key in avatars.show
+                  a.col-3.mb-3.avatar(href="#" onclick="selectAvatar(event, this)" class=(key == 0) ? 'btn-info' : '')
+                    img.card-img-top(src=avatarShow, style="height: 100px; width: 100px; display: block;margin:auto")
+              div.collapse#avatarsCollapse
+                div.row
+                  each avatarHide in avatars.hide
+                    a.col-3.mb-3.avatar(href="#" onclick="selectAvatar(event, this)")
+                      img.card-img-top(src=avatarHide, style="height: 100px; width: 100px; display: block;margin:auto")
+              a.btn.text-muted(data-toggle="collapse" href="#avatarsCollapse" aria-expanded="false" aria-controls="avatarsCollapse") Все аватарочки
+          div.form-group.row
+            div.offset-sm-2.col-sm-10
+              a.btn.btn-primary(href="#" onclick="saveUser(event)") Сохранить
+              span.text-muted.ml-3#user-save-message
+    div.col-sm-3
+      div.card
+        div.card-block
+          h4.card-title.m-0 Игры
+        ul.list-group.list-group-flush
+          li.list-group-item 1
+          li.list-group-item 2
+        div.card-block
+          a.card-link(href="#") Создать
+
+block script
+  script(type='text/javascript').
+//    global.on('user.changed', function (user) {
+//        $("#user_" + user.id + ' .name').text(user.name);
+//        $("#user_" + user.id + ' .avatar').attr('src', user.avatar);
+//    });
+//
+//    function selectAvatar(event, avatar) {
+//        event.preventDefault();
+//
+//        $(".avatar-select .avatar").removeClass("btn-info");
+//        $(avatar).addClass("btn-info");
+//    }
+//
+//    function saveUser() {
+//        event.preventDefault();
+//
+//        var message = $("#user-save-message");
+//        var name = $('input[name=name]').val();
+//        var avatar = $(".avatar-select .avatar.btn-info img").attr("src");
+//
+//        message.text('');
+//
+//        global.emit('user.save', {name: name, avatar: avatar}, function (response) {
+//            message.text(response.message);
+//        });
+//    }

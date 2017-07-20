@@ -1,6 +1,5 @@
 const fs = require('fs');
 const shuffle = require('shuffle-array');
-const faker = require('faker');
 
 /**
  * Отображение панели
@@ -13,7 +12,7 @@ exports.index = function (request, response) {
     var user = request.user;
     var avatars = getAvatars(user);
 
-    var name = user.name ? user.name : firstName();
+    var name = user.name ? user.name : '';
 
     response.render('site/index', {users: state.users, name: name, avatars: avatars});
 };
@@ -46,9 +45,4 @@ function getAvatars(user) {
         show: avatars.slice(0, 4),
         hide: avatars.slice(4)
     };
-}
-
-function firstName() {
-    faker.locale = 'ru';
-    return faker.name.firstName();
 }
