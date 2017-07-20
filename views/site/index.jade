@@ -49,11 +49,18 @@ block script
 
     global.on('user.add', function (response) {
         //Пользователь уже есть
-        if ($("#user_" + response.id).length) {
+        var userItem = $("#user_" + response.id);
+        if (userItem.length) {
+            userItem.replaceWith(response['online-item']);
             return;
         }
 
         $("#users-online").append(response['online-item']);
+    });
+
+    global.on('user.offline', function (user) {
+        console.log('user.offline', user);
+        $("#user_" + user.id).remove();
     });
 
     function selectAvatar(event, avatar) {

@@ -29,6 +29,16 @@ exports.init = function (host, port, state) {
             // Отвязываем пользователя от socketId
             socket.on('disconnect', function () {
                 currentUser.socketId = null;
+
+                // Если через 5 секунд после отсоединения пользователь не вернулся, считаем его offline
+                // Такое может быть при обновление странички
+                setTimeout(function () {
+                    if (currentUser.socketId) {
+                        return;
+                    }
+
+                    state.event('user.offline', currentUser);
+                }, 5000);
             });
         });
     });
