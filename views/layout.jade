@@ -25,7 +25,8 @@ html
   block script
 
   body(style="background-color:black")
-    block content
+    div.container-fluid.mt-3
+      block content
 
   script(type='text/javascript').
       var hash = Cookies.get('user_hash');

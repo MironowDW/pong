@@ -12,7 +12,7 @@ exports.index = function (request, response) {
     var user = request.user;
     var avatars = getAvatars(user);
 
-    var name = user.name ? user.name : '';
+    var name = user.name == 'без имени' ? '' : user.name;
 
     response.render('site/index', {users: state.users, name: name, avatars: avatars});
 };

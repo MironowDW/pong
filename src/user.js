@@ -5,7 +5,7 @@ exports.init = function (request, response, next) {
     var hash = request.cookies.user_hash;
     var user = state.getUser(hash);
 
-    // генерим пустого пользователя
+    // Генерим пустого пользователя
     if (!user) {
         hash = shortid.generate();
 
@@ -44,12 +44,8 @@ exports.initSocket = function (socket, state) {
 function User() {
     return {
         id: null,
-        name: null,
-        avatar: null,
-        socketId: null,
-
-        getName: function () {
-            return this.name ? this.name : 'без имени';
-        }
+        name: 'без имени',
+        avatar: '',
+        socketId: null
     };
 }

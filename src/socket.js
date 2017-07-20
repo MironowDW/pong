@@ -1,38 +1,35 @@
 var http = require('http');
 var io = require('socket.io');
 var user = require('./user');
+var game = require('./game');
 
 /**
  * Иницализирует socket на переданном хосте и порту
  */
-exports.init = function (host, port) {
+exports.init = function (host, port, state) {
     var server = http.createServer();
     server.listen(port, host);
+    io = io.listen(server);
+    state.setIo(io);
 
-    return function (request, response, next) {
-        io = io.listen(server);
+    io.sockets.on('connection', function (socket) {
+        socket.on('user.init', function (hash, callback) {
+            var currentUser = state.getUser(hash);
 
-        io.sockets.on('connection', function (socket) {
-            socket.on('user.init', function (hash, callback) {
-                var state = request.app.get('state');
-                var currentUser = state.getUser(hash);
+            // Привязываем сокет к пользователю
+            currentUser.socketId = socket.id;
 
-                // Привязываем сокет к пользователю
-                currentUser.socketId = socket.id;
+            callback(currentUser);
 
-                callback(currentUser);
+            console.log('User inited: ', currentUser);
 
-                console.log('User inited: ', currentUser);
+            user.initSocket(socket, state);
+            game.initSocket(socket, state);
 
-                user.initSocket(socket, state);
-                state.setIo(io);
+            // Отвязываем пользователя от socketId
+            socket.on('disconnect', function () {
+                currentUser.socketId = null;
             });
-
-            // socket.on('disconnect', function () {
-            //     console.log('disconnect');
-            // });
         });
-
-        next();
-    }
+    });
 };
