@@ -16,12 +16,23 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-var state = require('./src/state');
-var site = require('./src/controller/site');
+// Инициализируем текущего пользователя при каждом подключении
+var user = require('./src/user');
+app.use(user.init);
+
+// Инициализируем сокет
+var socketHost = process.env.SOCKET_HOST || '127.0.0.1';
+var socketPort = process.env.SOCKET_PORT || 3030;
+app.locals.socketHost = socketHost;
+app.locals.socketPort = socketPort;
+var socket = require('./src/socket');
+app.use(socket.init(socketHost, socketPort));
 
 // Глобальное состояние, все объекты будут храниться тут
+var state = require('./src/state');
 app.set('state', new state());
 
+var site = require('./src/controller/site');
 app.get('/', site.index);
 
 // TODO Зарефакторить

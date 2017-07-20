@@ -8,9 +8,53 @@ html
     link(rel='stylesheet', href='https://cdn.rawgit.com/twbs/bootstrap/v4-dev/dist/css/bootstrap.css')
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js')
     script(src='https://cdn.rawgit.com/twbs/bootstrap/v4-dev/dist/js/bootstrap.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.4/js.cookie.min.js')
+
+    script(type='text/javascript').
+      global = {
+          socket: null,
+          ons: [],
+
+          on: function (event, callback) {
+              this.isInited
+                  ? socket.on(event, callback)
+                  : this.ons.push({event: event, callback: callback});
+          }
+      };
 
   block script
 
   body(style="background-color:black")
     block content
 
+  script(type='text/javascript').
+      var hash = Cookies.get('user_hash');
+      var socketHost = "#{socketHost}";
+      var socketPort = "#{socketPort}";
+
+      if (!hash) {
+          alert('Пользователь не инициализирован, перезагрузите страничку');
+      }
+
+      if (hash) {
+          var socket = io.connect(socketHost + ':' + socketPort);
+
+          // Начинаем работу только после проверки пользователя
+          socket.emit('user.init', hash, function (user) {
+              if (!user) {
+                  alert('Пользователь не инициализирован, перезагрузите страничку');
+                  return false;
+              }
+
+              console.log('User inited', user);
+
+              global.socket = socket;
+              global.emit = function (event, message, callback) {
+                  socket.emit(event, message, callback);
+              };
+
+              for (var i in global.ons) {
+                  socket.on(global.ons[i].event, global.ons[i].callback)
+              }
+          });
+      }

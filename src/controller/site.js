@@ -10,18 +10,15 @@ const faker = require('faker');
  */
 exports.index = function (request, response) {
     var state = request.app.get('state');
+    var user = request.user;
+    var avatars = getAvatars(user);
 
-    var avatars = getAvatarsSrc();
-    var avatarsShow = avatars.slice(0, 4);
-    var avatarsHide = avatars.slice(4);
+    var name = user.name ? user.name : firstName();
 
-    faker.locale = 'ru';
-    var name = faker.name.firstName();
-
-    response.render('site/index', {name: name, avatarsShow: avatarsShow, avatarsHide: avatarsHide});
+    response.render('site/index', {users: state.users, name: name, avatars: avatars});
 };
 
-function getAvatarsSrc() {
+function getAvatars(user) {
     var avatars = [];
 
     fs.readdirSync('public/img/avatars/').forEach(function (file) {
@@ -30,5 +27,28 @@ function getAvatarsSrc() {
 
     shuffle(avatars);
 
-    return avatars;
+    // Аватарку пользователя ставим на первое место
+    if (user.avatar) {
+        avatars.sort(function (a, b) {
+            if (a == user.avatar) {
+                return -1;
+            }
+
+            if (b == user.avatar) {
+                return 1;
+            }
+
+            return 0;
+        });
+    }
+
+    return {
+        show: avatars.slice(0, 4),
+        hide: avatars.slice(4)
+    };
+}
+
+function firstName() {
+    faker.locale = 'ru';
+    return faker.name.firstName();
 }
