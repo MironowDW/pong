@@ -26,8 +26,14 @@ block content
     script(type='text/javascript').
       var gameId = "#{game.id}";
       var isNewUser = parseInt("#{isNewUser}");
+      var userId = parseInt("#{userId}");
       var timerStart = 5;
       var isStarted = false;
+
+      var sceneWidth = parseInt("#{sceneConfig.width}");
+      var sceneHeight = parseInt("#{sceneConfig.height}");
+      var sceneBoardWidth = parseInt("#{sceneConfig.board.width}");
+      var sceneBoardHeight = parseInt("#{sceneConfig.board.height}");
 
       if (isNewUser) {
           startTimer(timerStart, function () {
@@ -99,10 +105,10 @@ block content
       var scene = {
           context: null,
 
-          width: 600,
-          height: 400,
+          width: sceneWidth,
+          height: sceneHeight,
 
-          board: {width: 50, height: 10},
+          board: {width: sceneBoardWidth, height: sceneBoardHeight},
 
           init: function () {
               scene.render();
@@ -154,10 +160,10 @@ block content
                   }
 
                   if (event.keyCode == 37) {
-                      socket.emit('ls', gameId); // left start
+                      socket.emit('ls', {g: gameId, u: userId}); // left start
                   }
                   if (event.keyCode == 39) {
-                      socket.emit('rs', gameId); // right start
+                      socket.emit('rs', {g: gameId, u: userId}); // right start
                   }
               });
 
@@ -167,10 +173,10 @@ block content
                   }
 
                   if (event.keyCode == 37) {
-                      socket.emit('le', gameId); // left end
+                      socket.emit('le', {g: gameId, u: userId}); // left end
                   }
                   if (event.keyCode == 39) {
-                      socket.emit('re', gameId); // right end
+                      socket.emit('re', {g: gameId, u: userId}); // right end
                   }
               });
           }

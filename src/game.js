@@ -1,13 +1,11 @@
 var shortid = require('shortid');
 
+exports.getSceneConfig = getSceneConfig;
+
 exports.initSocket = function (socket, state) {
     socket.on('game.create', function (data, callback) {
-        var hash = state.getHashBySocketId(socket.id);
-        if (!hash) {
-            return;
-        }
+        var user = state.getUserBySocketId(socket.id);
 
-        var user = state.getUser(hash);
         var game = new Game();
         game.id = shortid();
         game.userId1 = user.id;
@@ -19,8 +17,7 @@ exports.initSocket = function (socket, state) {
 
     socket.on('game.ready', function (gameId) {
         var game = state.getGame(gameId);
-        var hash = state.getHashBySocketId(socket.id);
-        var user = state.getUser(hash);
+        var user = state.getUserBySocketId(socket.id);
 
         if (game.userId1 == user.id) {
             game.userReady1 = true;
@@ -42,32 +39,20 @@ exports.initSocket = function (socket, state) {
         }
     });
 
-    socket.on('ls', function (gameId) {
-        var hash = state.getHashBySocketId(socket.id);
-        var user = state.getUser(hash);
-
-        state.rooms[gameId].players[user.id].startLeft = true;
+    socket.on('ls', function (data) {
+        state.rooms[data.g].players[data.u].startLeft = true;
     });
 
-    socket.on('rs', function (gameId) {
-        var hash = state.getHashBySocketId(socket.id);
-        var user = state.getUser(hash);
-
-        state.rooms[gameId].players[user.id].startRight = true;
+    socket.on('rs', function (data) {
+        state.rooms[data.g].players[data.u].startRight = true;
     });
 
-    socket.on('le', function (gameId) {
-        var hash = state.getHashBySocketId(socket.id);
-        var user = state.getUser(hash);
-
-        state.rooms[gameId].players[user.id].startLeft = false;
+    socket.on('le', function (data) {
+        state.rooms[data.g].players[data.u].startLeft = false;
     });
 
-    socket.on('re', function (gameId) {
-        var hash = state.getHashBySocketId(socket.id);
-        var user = state.getUser(hash);
-
-        state.rooms[gameId].players[user.id].startRight = false;
+    socket.on('re', function (data) {
+        state.rooms[data.g].players[data.u].startRight = false;
     });
 };
 
@@ -78,10 +63,7 @@ function Game() {
         userId2: null,
         userReady1: false,
         userReady2: false,
-        status: 'new',
-        setting: {
-            access: 'url'
-        }
+        status: 'new'
     };
 }
 
@@ -196,13 +178,23 @@ function Ball(room, x, y) {
     };
 }
 
+function getSceneConfig() {
+    return {
+        width: 600,
+        height: 400,
+        board: {width: 50, height: 10}
+    };
+}
+
 function Room(game, user1, user2, io) {
+    var config = getSceneConfig();
+
     return {
         io: io,
 
-        width: 600,
-        height: 400,
-        board: {width: 50, height: 10},
+        width: config.width,
+        height: config.height,
+        board: config.width.board,
 
         socket1: user1.socketId,
         socket2: user2.socketId,

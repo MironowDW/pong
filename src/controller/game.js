@@ -1,4 +1,5 @@
 var jade = require("jade");
+var gameService = require("../game");
 
 exports.index = function (request, response) {
     var state = request.app.get('state');
@@ -35,5 +36,12 @@ exports.index = function (request, response) {
     var user1 = state.getUserById(game.userId1);
     var user2 = game.userId2 ? state.getUserById(game.userId2) : null;
 
-    response.render('game/index', {user1: user1, user2: user2, game: game, isNewUser: isNewUser});
+    response.render('game/index', {
+        user1: user1,
+        user2: user2,
+        game: game,
+        isNewUser: isNewUser,
+        userId: request.user.id,
+        sceneConfig: gameService.getSceneConfig()
+    });
 };

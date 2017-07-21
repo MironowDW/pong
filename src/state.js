@@ -22,6 +22,15 @@ module.exports = function (app) {
 
             return null;
         },
+        getUserBySocketId: function (socketId) {
+            for (var hash in this.users) {
+                if (this.users[hash].socketId == socketId) {
+                    return this.users[hash];
+                }
+            }
+
+            return null;
+        },
         getUserById: function (id) {
             for (var hash in this.users) {
                 if (this.users[hash].id == id) {
