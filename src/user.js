@@ -46,6 +46,7 @@ function User() {
         id: null,
         name: 'без имени',
         avatar: '',
-        socketId: null
+        socketId: null,
+        status: 'online'
     };
 }

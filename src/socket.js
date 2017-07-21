@@ -13,6 +13,7 @@ exports.init = function (host, port, state) {
     state.setIo(io);
 
     io.sockets.on('connection', function (socket) {
+        // Собитие после которого можно работать с соединением
         socket.on('user.init', function (hash, callback) {
             var currentUser = state.getUser(hash);
 
@@ -37,7 +38,7 @@ exports.init = function (host, port, state) {
                         return;
                     }
 
-                    state.event('user.offline', currentUser);
+                    state.userOffline(currentUser);
                 }, 5000);
             });
         });

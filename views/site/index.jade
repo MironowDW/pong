@@ -8,7 +8,8 @@ block content
           h4.card-title.m-0 Пользователи онлайн
         ul.list-group.list-group-flush#users-online
           each user in users
-            include ../user/online-item
+            if user.status == 'online'
+              include ../user/online-item
     div.col-sm-6
       a.btn.btn-primary.mb-3(style="width:100%" href="#" onclick="createGame(event)") Создать игру
       div.card

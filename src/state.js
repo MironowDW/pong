@@ -49,6 +49,10 @@ module.exports = function (app) {
 
             return user;
         },
+        userOffline: function (user) {
+            user.status = 'offline';
+            this.event('user.offline', user);
+        },
 
         addGame: function (game) {
             this.games[game.id] = game;
