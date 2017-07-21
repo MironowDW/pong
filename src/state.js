@@ -76,7 +76,10 @@ module.exports = function (app) {
         addGame: function (game) {
             this.games[game.id] = game;
 
-            this.event('game.add', game);
+            this.event('game.add', {
+                id: game.id,
+                item: jade.renderFile(app.get('views') + '/game/list-item.jade', {game: game})
+            });
 
             return game;
         },

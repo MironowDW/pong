@@ -73,8 +73,10 @@ function Player(room, x, y) {
 
         x: x,
         y: y,
+
         x_speed: 0,
         y_speed: 0,
+
         startLeft: false,
         startRight: false,
 

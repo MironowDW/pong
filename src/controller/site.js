@@ -14,7 +14,12 @@ exports.index = function (request, response) {
 
     var name = user.name == 'без имени' ? '' : user.name;
 
-    response.render('site/index', {users: state.users, name: name, avatars: avatars});
+    response.render('site/index', {
+        users: state.users,
+        games: state.games,
+        name: name,
+        avatars: avatars
+    });
 };
 
 function getAvatars(user) {

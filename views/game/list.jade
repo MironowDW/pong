@@ -1,7 +1,16 @@
 div.card
   div.card-block
     h4.card-title.m-0 Игры
-  ul.list-group.list-group-flush
-    li.list-group-item 1
-    li.list-group-item 2
-    li.list-group-item 3
+  ul.list-group.list-group-flush#game-list
+    each game in games
+      include ./list-item
+script(type='text/javascript').
+  global.on('game.add', function (response) {
+      var item = $("#game_" + response.id);
+      if (item.length) {
+          item.replaceWith(response.item);
+          return;
+      }
+
+      $("#game-list").append(response.item);
+  });
