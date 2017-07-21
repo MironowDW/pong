@@ -3,13 +3,7 @@ extends ../layout
 block content
   div.row
     div.col-sm-3
-      div.card
-        div.card-block
-          h4.card-title.m-0 Пользователи онлайн
-        ul.list-group.list-group-flush#users-online
-          each user in users
-            if user.status == 'online'
-              include ../user/online-item
+      include ../user/online-list
     div.col-sm-6
       a.btn.btn-primary.mb-3(style="width:100%" href="#" onclick="createGame(event)") Создать игру
       div.card
@@ -35,35 +29,10 @@ block content
             div.col-sm-12
               a.btn.btn-outline-primary(href="#" onclick="saveUser(event)" style="width: 100%") Сохранить
     div.col-sm-3
-      div.card
-        div.card-block
-          h4.card-title.m-0 Игры
-        ul.list-group.list-group-flush
-          li.list-group-item 1
-          li.list-group-item 2
+      include ../game/list
 
 block script
   script(type='text/javascript').
-    global.on('user.changed', function (response) {
-        $("#user_" + response.id).replaceWith(response['online-item']);
-    });
-
-    global.on('user.add', function (response) {
-        //Пользователь уже есть
-        var userItem = $("#user_" + response.id);
-        if (userItem.length) {
-            userItem.replaceWith(response['online-item']);
-            return;
-        }
-
-        $("#users-online").append(response['online-item']);
-    });
-
-    global.on('user.offline', function (user) {
-        console.log('user.offline', user);
-        $("#user_" + user.id).remove();
-    });
-
     function selectAvatar(event, avatar) {
         event.preventDefault();
 
@@ -86,6 +55,6 @@ block script
         event.preventDefault();
 
         global.emit('game.create', {}, function (game) {
-            console.log(game);
+            window.location.href = '/game/' + game.id;
         });
     }

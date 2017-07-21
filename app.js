@@ -33,9 +33,9 @@ var socket = require('./src/socket');
 socket.init(socketHost, socketPort, app.get('state'));
 
 var site = require('./src/controller/site');
-// var game = require('./src/controller/game');
+var game = require('./src/controller/game');
 app.get('/', site.index);
-// app.get('/game', game.create);
+app.get('/game/:id', game.index);
 
 // TODO Зарефакторить
 // var newGame = require('./routes/new_game');

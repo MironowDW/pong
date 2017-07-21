@@ -8,6 +8,7 @@ module.exports = function (app) {
         users: {},
 
         games: {},
+        rooms: {},
 
         getUser: function (hash) {
             return this.users[hash];
@@ -16,6 +17,15 @@ module.exports = function (app) {
             for (var hash in this.users) {
                 if (this.users[hash].socketId == socketId) {
                     return hash;
+                }
+            }
+
+            return null;
+        },
+        getUserById: function (id) {
+            for (var hash in this.users) {
+                if (this.users[hash].id == id) {
+                    return this.users[hash];
                 }
             }
 
@@ -60,6 +70,9 @@ module.exports = function (app) {
             this.event('game.add', game);
 
             return game;
+        },
+        getGame: function (id) {
+            return this.games[id];
         },
 
         emits: [],

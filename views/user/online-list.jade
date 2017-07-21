@@ -1,0 +1,27 @@
+div.card
+  div.card-block
+    h4.card-title.m-0 Пользователи онлайн
+  ul.list-group.list-group-flush#users-online
+    each user in users
+      if user.status == 'online'
+        include ./online-item
+script(type='text/javascript').
+  global.on('user.changed', function (response) {
+      $("#user_" + response.id).replaceWith(response['online-item']);
+  });
+
+  global.on('user.add', function (response) {
+      //Пользователь уже есть
+      var userItem = $("#user_" + response.id);
+      if (userItem.length) {
+          userItem.replaceWith(response['online-item']);
+          return;
+      }
+
+      $("#users-online").append(response['online-item']);
+  });
+
+  global.on('user.offline', function (user) {
+      console.log('user.offline', user);
+      $("#user_" + user.id).remove();
+  });

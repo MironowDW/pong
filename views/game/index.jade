@@ -1,0 +1,165 @@
+extends ../layout
+
+block content
+    div.row
+      div.col-sm-2
+      div.col-sm-8
+        div.row.mb-3
+          div.col-sm-5.text-white.font-weight-bold.text-right
+            span.name #{user1.name}
+            img.avatar(src=user1.avatar height="100px")
+          div.col-sm-2.text-center.text-white
+            h2 vs
+            h1#timer
+          div.col-sm-5.text-white.font-weight-bold.text-left#user2-item
+            if user2
+              include user2-item
+        div.row
+          div.col-sm-12
+            div.scene(style="border: 1px white solid")
+      div.col-sm-2
+    script(type='text/javascript').
+      var gameId = "#{game.id}";
+      var isNewUser = parseInt("#{isNewUser}");
+      var timerStart = 5;
+      var isStarted = false;
+
+      if (isNewUser) {
+          startTimer(timerStart, function () {
+              // Пользователь готов началь игру
+              global.emit('game.ready', gameId);
+          });
+      }
+
+      global.on('game.change', function (response) {
+          if (response.game.id != gameId) {
+              return;
+          }
+
+          if (response.type == 'ready') {
+              $("#user2-item").html(response.item);
+
+              startTimer(timerStart, function () {
+                  // Пользователь готов началь игру
+                  global.emit('game.ready', gameId);
+              });
+          }
+      });
+
+      global.on('game.start', function (startedGameId) {
+          if (startedGameId != gameId) {
+              return;
+          }
+
+          isStarted = true;
+      });
+
+      global.on('t', function (state) {
+          if (state.id != gameId) {
+              return;
+          }
+
+          scene.update(state);
+      });
+
+      function startTimer(start, callback) {
+          setTime(start);
+
+          var intervalId = setInterval(function () {
+              start--;
+
+              setTime(start);
+
+              if (start == 0) {
+                  clearInterval(intervalId);
+                  setTime('');
+                  callback();
+              }
+          }, 1000);
+
+          function setTime(time) {
+              $("#timer").text(time);
+          }
+      }
+
+      var scene = {
+          context: null,
+
+          width: 600,
+          height: 400,
+
+          board: {width: 50, height: 10},
+
+          init: function () {
+              scene.render();
+
+              scene.update({
+                  // Первый игрок
+                  p1: {x: (scene.width / 2) - (scene.board.width / 2), y: (scene.height - (10 + 10))},
+                  // Второй игрок
+                  p2: {x: (scene.width / 2) - (scene.board.width / 2), y: 10},
+                  // Мяч
+                  b: {x: scene.width / 2, y: scene.height / 2}
+              });
+
+              scene.register();
+          },
+          render: function () {
+              var canvas = document.createElement("canvas");
+
+              canvas.width = scene.width;
+              canvas.height = scene.height;
+
+              document.getElementsByClassName('scene')[0].appendChild(canvas);
+
+              scene.context = canvas.getContext('2d');
+          },
+          update: function (state) {
+              // Закрашиваем сцену
+              scene.context.fillStyle = "#000000";
+              scene.context.fillRect(0, 0, scene.width, scene.height);
+
+              // Доска 1 игрока
+              scene.context.fillStyle = "#FFFFFF";
+              scene.context.fillRect(state.p1.x, state.p1.y, scene.board.width, scene.board.height);
+
+              // Доска 2 игрока
+              scene.context.fillStyle = "#FFFFFF";
+              scene.context.fillRect(state.p2.x, state.p2.y, scene.board.width, scene.board.height);
+
+              // Мячик
+              scene.context.beginPath();
+              scene.context.arc(state.b.x, state.b.y, 5, 2 * Math.PI, false);
+              scene.context.fillStyle = "#FFFFFF";
+              scene.context.fill();
+          },
+          register: function() {
+              window.addEventListener("keydown", function (event) {
+                  if (!isStarted) {
+                      return;
+                  }
+
+                  if (event.keyCode == 37) {
+                      socket.emit('ls', gameId); // left start
+                  }
+                  if (event.keyCode == 39) {
+                      socket.emit('rs', gameId); // right start
+                  }
+              });
+
+              window.addEventListener("keyup", function (event) {
+                  if (!isStarted) {
+                      return;
+                  }
+
+                  if (event.keyCode == 37) {
+                      socket.emit('le', gameId); // left end
+                  }
+                  if (event.keyCode == 39) {
+                      socket.emit('re', gameId); // right end
+                  }
+              });
+          }
+      };
+
+      window.onload = scene.init;
