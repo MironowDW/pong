@@ -17,6 +17,7 @@ exports.index = function (request, response) {
     // Кто-то зашел в игру, делаем его вторым игроком
     if (!isUser1 && !game.userId2) {
         game.userId2 = request.user.id;
+        game.user2 = request.user;
         state.event('game.change', {
             type: 'ready',
             item: jade.renderFile(request.app.get('views') + '/game/user2-item.jade', {user2: request.user}),

@@ -9,6 +9,7 @@ exports.initSocket = function (socket, state) {
         var game = new Game();
         game.id = shortid();
         game.userId1 = user.id;
+        game.user1 = user;
 
         game = state.addGame(game);
 
@@ -61,6 +62,8 @@ function Game() {
         id: null,
         userId1: null, // Создатель
         userId2: null,
+        user1: null,
+        user2: null,
         userReady1: false,
         userReady2: false,
         status: 'new'

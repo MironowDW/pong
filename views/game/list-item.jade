@@ -1,2 +1,12 @@
 li.list-group-item(id='game_' + game.id)
-  span #{game.id}
+  div.row
+    div.col-5
+      img.avatar(src=game.user1.avatar height="30px")
+      span.name #{game.user1.name}
+    div.col-2 vs
+    div.col-5.text-right
+      if game.user2
+        span.name #{game.user2.name}
+        img.avatar(src=game.user2.avatar height="30px")
+      if !game.user2
+        a(href="#") вступить
