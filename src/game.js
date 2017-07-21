@@ -87,6 +87,8 @@ function Game() {
 
 function Player(room, x, y) {
     return {
+        score: 0,
+
         x: x,
         y: y,
         x_speed: 0,
@@ -149,18 +151,32 @@ function Ball(room, x, y) {
                 this.x_speed = -this.x_speed;
             }
 
+            // Мячик ударился об край сцены
             if (this.y < 0 || this.y > room.height) {
                 if (this.y < 0) {
                     this.y_speed = 3 * 2;
-                    // player2.score++;
+                    player2.score++;
                 } else {
                     this.y_speed = -(3 * 2);
-                    // player1.score++;
+                    player1.score++;
                 }
 
                 this.x_speed = 0;
                 this.x = room.width / 2;
                 this.y = room.height / 2;
+
+                room.io.to(room.socket1).emit('s', {1: player1.score, 2: player2.score});
+                room.io.to(room.socket2).emit('s', {1: player1.score, 2: player2.score});
+
+                // Победитель!
+                if (player1.score >= 10 || player2.score >= 10) {
+                    var winner = player1.score >= 10 ? 1 : 2;
+
+                    room.io.to(room.socket1).emit('e', winner);
+                    room.io.to(room.socket2).emit('e', winner);
+
+                    room.stop();
+                }
             }
 
             if (top_y > room.height / 2) {
@@ -182,12 +198,19 @@ function Ball(room, x, y) {
 
 function Room(game, user1, user2, io) {
     return {
+        io: io,
+
         width: 600,
         height: 400,
         board: {width: 50, height: 10},
 
+        socket1: user1.socketId,
+        socket2: user2.socketId,
+
         players: {},
         ball: {x: this.width / 2, y: this.height / 2},
+
+        emergencyBrake: false,
 
         start: function () {
             var width = this.width;
@@ -204,7 +227,15 @@ function Room(game, user1, user2, io) {
             this.tick();
         },
 
+        stop: function () {
+            this.emergencyBrake = true;
+        },
+
         tick: function () {
+            if (this.emergencyBrake) {
+                return;
+            }
+
             this.players[user1.id].update();
             this.players[user2.id].update();
             this.ball.update(this.players[user1.id], this.players[user2.id]);

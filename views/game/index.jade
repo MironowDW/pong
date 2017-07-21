@@ -4,13 +4,18 @@ block content
     div.row
       div.col-sm-2
       div.col-sm-8
-        div.row.mb-3
+        div.row.mb-3(style="min-height: 95px")
           div.col-sm-5.text-white.font-weight-bold.text-right
             span.name #{user1.name}
-            img.avatar(src=user1.avatar height="100px")
+            if user1.avatar
+              img.avatar(src=user1.avatar height="100px")
           div.col-sm-2.text-center.text-white
             h2 vs
             h1#timer
+            h1
+              span#score1
+              span#score-delimeter
+              span#score2
           div.col-sm-5.text-white.font-weight-bold.text-left#user2-item
             if user2
               include user2-item
@@ -52,6 +57,10 @@ block content
           }
 
           isStarted = true;
+
+          $("#score-delimeter").text(':');
+          $("#score1").text('0');
+          $("#score2").text('0');
       });
 
       global.on('t', function (state) {
@@ -60,6 +69,11 @@ block content
           }
 
           scene.update(state);
+      });
+
+      global.on('s', function (score) {
+          $("#score1").text(score['1']);
+          $("#score2").text(score['2']);
       });
 
       function startTimer(start, callback) {
