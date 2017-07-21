@@ -66,15 +66,15 @@ block script
     function selectAvatar(event, avatar) {
         event.preventDefault();
 
-        $(".avatar-select .avatar").removeClass("btn-info");
-        $(avatar).addClass("btn-info");
+        $(".avatar-select .avatar").removeClass("btn-primary");
+        $(avatar).addClass("btn-primary");
     }
 
     function saveUser(event) {
         event.preventDefault();
 
         var name = $('input[name=name]').val();
-        var avatar = $(".avatar-select .avatar.btn-info img").attr("src");
+        var avatar = $(".avatar-select .avatar.btn-primary img").attr("src");
 
         global.emit('user.save', {name: name, avatar: avatar});
 
