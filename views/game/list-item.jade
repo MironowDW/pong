@@ -3,7 +3,11 @@ li.list-group-item(id='game_' + game.id)
     div.col-5
       img.avatar(src=game.user1.avatar height="30px")
       span.name #{game.user1.name}
-    div.col-2 vs
+    div.col-2
+      if game.userId1 == currentUserId || game.userId2 == currentUserId
+        a(href="/game/" + game.id title="Перейти в игру" data-toggle="tooltip" data-placement="top") vs
+      else
+        span vs
     div.col-5.text-right
       if game.user2
         span.name #{game.user2.name}

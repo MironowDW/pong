@@ -1,28 +1,39 @@
 extends ../layout
 
 block content
-    div.row
-      div.col-sm-2
-      div.col-sm-8
-        div.row.mb-3(style="min-height: 95px")
-          div.col-sm-5.text-white.font-weight-bold.text-right
+    div.row.mb-3(style="min-height: 95px")
+        div.col-sm-5.text-white.font-weight-bold.text-right
             span.name #{user1.name}
             if user1.avatar
-              img.avatar(src=user1.avatar height="100px")
-          div.col-sm-2.text-center.text-white
+                img.avatar(src=user1.avatar height="100px")
+        div.col-sm-2.text-center.text-white
             h2 vs
             h1#timer
             h1
-              span#score1
-              span#score-delimeter
-              span#score2
-          div.col-sm-5.text-white.font-weight-bold.text-left#user2-item
+                span#score1
+                span#score-delimeter
+                span#score2
+        div.col-sm-5.text-white.font-weight-bold.text-left#user2-item
             if user2
-              include user2-item
+                include user2-item
+    div.row
+      div.col-sm-3
+        div.card
+          div.card-block
+            h4.card-title Настройки
+            div.form-group
+              label Доступ
+              select.form-control
+                option по прямой ссылке
+                option всем
+            div.form-group.row.mb-0
+              div.col-sm-12
+                a.btn.btn-outline-primary(href="#" onclick="saveUser(event)" style="width: 100%") Сохранить
+      div.col-sm-6
         div.row
           div.col-sm-12
             div.scene(style="border: 1px white solid")
-      div.col-sm-2
+      div.col-sm-3
     script(type='text/javascript').
       var gameId = "#{game.id}";
       var isNewUser = parseInt("#{isNewUser}");
