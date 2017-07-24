@@ -12,6 +12,7 @@ html
 
     script(type='text/javascript').
       global = {
+          userId: null,
           socket: null,
           ons: [],
 
@@ -32,6 +33,7 @@ html
       var hash = Cookies.get('user_hash');
       var socketHost = "#{socketHost}";
       var socketPort = "#{socketPort}";
+      global.userId = parseInt("#{currentUserId}");
 
       if (!hash) {
           alert('Пользователь не инициализирован, перезагрузите страничку');

@@ -25,3 +25,14 @@ script(type='text/javascript').
       console.log('user.offline', user);
       $("#user_" + user.id).remove();
   });
+
+  global.on('user.online', function (response) {
+      //Пользователь уже есть
+      var userItem = $("#user_" + response.id);
+      if (userItem.length) {
+          userItem.replaceWith(response['online-item']);
+          return;
+      }
+
+      $("#users-online").append(response['online-item']);
+  });

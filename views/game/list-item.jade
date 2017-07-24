@@ -8,5 +8,5 @@ li.list-group-item(id='game_' + game.id)
       if game.user2
         span.name #{game.user2.name}
         img.avatar(src=game.user2.avatar height="30px")
-      if !game.user2
+      if !game.user2 && currentUserId != game.userId1
         a(href="#") вступить

@@ -72,6 +72,14 @@ module.exports = function (app) {
             user.status = 'offline';
             this.event('user.offline', user);
         },
+        userOnline: function (user) {
+            user.status = 'online';
+
+            this.event('user.online', {
+                id: user.id,
+                'online-item': jade.renderFile(app.get('views') + '/user/online-item.jade', {user: user})
+            });
+        },
 
         addGame: function (game) {
             this.games[game.id] = game;

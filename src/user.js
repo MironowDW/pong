@@ -16,6 +16,11 @@ exports.init = function (request, response, next) {
     }
 
     request.user = user;
+    request.app.locals.currentUserId = user.id;
+
+    if (user.status == 'offline') {
+        state.userOnline(user);
+    }
 
     next();
 };
