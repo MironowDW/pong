@@ -4,7 +4,7 @@ exports.getSceneConfig = getSceneConfig;
 
 exports.initSocket = function (socket, state) {
     socket.on('game.create', function (data, callback) {
-        var user = state.getUserBySocketId(socket.id);
+        var user = state.user.findBySocketId(socket.id);
 
         var game = new Game();
         game.id = shortid();
@@ -24,7 +24,7 @@ exports.initSocket = function (socket, state) {
 
     socket.on('game.ready', function (gameId) {
         var game = state.getGame(gameId);
-        var user = state.getUserBySocketId(socket.id);
+        var user = state.user.findBySocketId(socket.id);
 
         if (game.userId1 == user.id) {
             game.userReady1 = true;
@@ -36,8 +36,8 @@ exports.initSocket = function (socket, state) {
 
         // Все готовы, поехали
         if (game.userReady1 && game.userReady2) {
-            var user1 = state.getUserById(game.userId1);
-            var user2 = state.getUserById(game.userId2);
+            var user1 = state.user.findById(game.userId1);
+            var user2 = state.user.findById(game.userId2);
 
             var room = new Room(game, user1, user2, state.io);
             room.start();

@@ -7,26 +7,27 @@ div.card
         include ./online-item
 script(type='text/javascript').
   global.on('user.changed', function (response) {
-      $("#user_" + response.id).replaceWith(response['online-item']);
-  });
+      var el = $("#user_" + response.user.id);
 
-  global.on('user.add', function (response) {
-      //Пользователь уже есть
-      var userItem = $("#user_" + response.id);
-      if (userItem.length) {
-          userItem.replaceWith(response['online-item']);
+      // Пользователь ушел в offline, удаляем его
+      if (response.user.status == 'offline') {
+          el.remove();
           return;
       }
 
-      $("#users-online").append(response['online-item']);
+      // Пользователь уже есть, заменяем новыми данными
+      if (el.length) {
+          el.replaceWith(response['online-item']);
+          return;
+      }
+
+      // Пользователя нет, добавляем
+      if (!el.length) {
+          $("#users-online").append(response['online-item']);
+      }
   });
 
-  global.on('user.offline', function (user) {
-      console.log('user.offline', user);
-      $("#user_" + user.id).remove();
-  });
-
-  global.on('user.online', function (response) {
+  global.on('user.add', function (response) {
       //Пользователь уже есть
       var userItem = $("#user_" + response.id);
       if (userItem.length) {

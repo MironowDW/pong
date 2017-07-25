@@ -34,8 +34,8 @@ exports.index = function (request, response) {
         return;
     }
 
-    var user1 = state.getUserById(game.userId1);
-    var user2 = game.userId2 ? state.getUserById(game.userId2) : null;
+    var user1 = state.user.findById(game.userId1);
+    var user2 = game.userId2 ? state.user.findById(game.userId2) : null;
 
     response.render('game/index', {
         user1: user1,

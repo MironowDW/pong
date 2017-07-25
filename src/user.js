@@ -1,25 +1,20 @@
-var shortid = require('shortid');
-
 exports.init = function (request, response, next) {
     var state = request.app.get('state');
     var hash = request.cookies.user_hash;
-    var user = state.getUser(hash);
+    var user = state.user.findByHash(hash);
 
     // Генерим пустого пользователя
     if (!user) {
-        hash = shortid.generate();
+        user = state.user.generate();
 
-        user = new User();
-        user = state.addUser(hash, user);
-
-        response.cookie('user_hash', hash);
+        response.cookie('user_hash', user.hash);
     }
 
     request.user = user;
     request.app.locals.currentUserId = user.id;
 
     if (user.status == 'offline') {
-        state.userOnline(user);
+        state.user.update(user.id, {status: 'online'});
     }
 
     next();
@@ -27,28 +22,19 @@ exports.init = function (request, response, next) {
 
 exports.initSocket = function (socket, state) {
     socket.on('user.save', function (data) {
-        if (!data.name && !data.avatar) {
-            // callback({type: 'error', message: 'Нечего сохранять'});
-            return;
-        }
-
-        var hash = state.getHashBySocketId(socket.id);
-        if (!hash) {
-            //callback({type: 'error', message: 'Пользователь не найден'});
-            return;
-        }
-
-        state.updateUser(hash, data);
-
-        //callback({type: 'success', message: 'Сохранено'});
+        var user = state.user.findBySocketId(socket.id);
+        state.user.update(user.id, data);
 
         console.log('User saved', data);
     });
 };
 
+exports.User = User;
+
 function User() {
     return {
         id: null,
+        hash: null,
         name: 'без имени',
         avatar: '',
         socketId: null,

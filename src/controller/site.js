@@ -15,7 +15,7 @@ exports.index = function (request, response) {
     var name = user.name == 'без имени' ? '' : user.name;
 
     response.render('site/index', {
-        users: state.users,
+        users: state.user.findOnline(),
         games: state.games,
         name: name,
         avatars: avatars

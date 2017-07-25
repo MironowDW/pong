@@ -3,8 +3,12 @@ var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
 var app = express();
+var loki = require('lokijs');
+
+// Инициализируем bd
+var db = require('./src/db');
+app.set('db', new db.init(loki, 'db/loki.json'));
 
 // Щаблоны
 app.set('views', path.join(__dirname, 'views'));
@@ -18,7 +22,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Глобальное состояние, все объекты будут храниться тут
 var state = require('./src/state');
-app.set('state', new state(app));
+app.set('state', new state(app.get('views'), app.get('db')));
 
 // Инициализируем текущего пользователя при каждом подключении
 var user = require('./src/user');

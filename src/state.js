@@ -1,6 +1,9 @@
 var jade = require("jade");
+var shortid = require('shortid');
+var emitter = require('./emitter');
+var UserModel = require("./user").User;
 
-module.exports = function (app) {
+module.exports = function (viewsPath, db) {
     return {
         io: null,
 
@@ -10,75 +13,126 @@ module.exports = function (app) {
         games: {},
         rooms: {},
 
-        getUser: function (hash) {
-            return this.users[hash];
-        },
-        getHashBySocketId: function (socketId) {
-            for (var hash in this.users) {
-                if (this.users[hash].socketId == socketId) {
-                    return hash;
+        user: {
+
+            /**
+             * @returns {User[]}
+             */
+            findOnline: function () {
+                var dbUsers = db.user().find({status: 'online'});
+                var users = [];
+
+                for (var i in dbUsers) {
+                    users.push(this.wrap(dbUsers[i]));
                 }
-            }
 
-            return null;
-        },
-        getUserBySocketId: function (socketId) {
-            for (var hash in this.users) {
-                if (this.users[hash].socketId == socketId) {
-                    return this.users[hash];
+                return users;
+            },
+
+            /**
+             * @returns {User}
+             */
+            findById: function(id) {
+                return this.wrap(db.user().get(id));
+            },
+
+            /**
+             * @returns {User}
+             */
+            findByHash: function(hash) {
+                return this.wrap(db.user().findOne({hash: hash}));
+            },
+
+            /**
+             * @returns {User}
+             */
+            findBySocketId: function (socketId) {
+                return this.wrap(db.user().findOne({socketId: socketId}));
+            },
+
+            /**
+             * @returns {User}
+             */
+            generate: function () {
+                var dbUser = db.user().insert({
+                    name: 'без имени',
+                    hash: shortid.generate(),
+                    avatar: '',
+                    status: 'online',
+                    socketId: null
+                });
+                var user = this.wrap(dbUser);
+
+                emitter.event('user.add', {
+                    id: user.id,
+                    'online-item': jade.renderFile(viewsPath + '/user/online-item.jade', {user: user})
+                });
+
+                return user;
+            },
+
+            /**
+             * @returns {User}
+             */
+            update: function (id, data) {
+                var dbUser = db.user().get(id);
+                var emit = false;
+                if (!dbUser) {
+                    throw 'Пользователь не найден';
                 }
-            }
 
-            return null;
-        },
-        getUserById: function (id) {
-            for (var hash in this.users) {
-                if (this.users[hash].id == id) {
-                    return this.users[hash];
+                if (data.name && data.name != dbUser.name) {
+                    dbUser.name = data.name;
+                    emit = true;
                 }
+
+                if (data.avatar && data.avatar != dbUser.avatar) {
+                    dbUser.avatar = data.avatar;
+                    emit = true;
+                }
+
+                if (data.status && data.status != dbUser.status) {
+                    dbUser.status = data.status;
+                    emit = true;
+                }
+
+                if (data.socketId && data.socketId != dbUser.socketId) {
+                    dbUser.socketId = data.socketId;
+                }
+
+                db.user().update(dbUser);
+
+                if (emit) {
+                    emitter.event('user.changed', {
+                        user: {
+                            id: id,
+                            status: dbUser.status
+                        },
+                        'online-item': jade.renderFile(viewsPath + '/user/online-item.jade', {user: dbUser})
+                    });
+                }
+
+                return this.wrap(dbUser);
+            },
+
+            /**
+             * @returns {User}
+             */
+            wrap: function (dbUser) {
+                if (!dbUser) {
+                    return null;
+                }
+
+                var model = new UserModel();
+                model.id = dbUser['$loki'];
+                model.name = dbUser.name;
+                model.avatar = dbUser.avatar;
+                model.status = dbUser.status;
+                model.hash = dbUser.hash;
+                model.socketId = dbUser.socketId;
+
+                return model;
             }
-
-            return null;
-        },
-        updateUser: function (hash, data) {
-            if (data.name) {
-                this.users[hash].name = data.name;
-            }
-            if (data.avatar) {
-                this.users[hash].avatar = data.avatar;
-            }
-
-            var user = this.users[hash];
-
-            this.event('user.changed', {
-                id: user.id,
-                'online-item': jade.renderFile(app.get('views') + '/user/online-item.jade', {user: user})
-            });
-        },
-        addUser: function (hash, user) {
-            user.id = this.userLastId;
-            this.userLastId++;
-
-            this.users[hash] = user;
-
-            this.event('user.add', {
-                id: user.id,
-                'online-item': jade.renderFile(app.get('views') + '/user/online-item.jade', {user: user})
-            });
-
-            return user;
-        },
-        userOffline: function (user) {
-            user.status = 'offline';
-            this.event('user.offline', user);
-        },
-        userOnline: function (user) {
-            user.status = 'online';
-
-            this.event('user.online', {
-                id: user.id,
-                'online-item': jade.renderFile(app.get('views') + '/user/online-item.jade', {user: user})
-            });
         },
 
         addGame: function (game) {
@@ -86,7 +140,7 @@ module.exports = function (app) {
 
             this.event('game.add', {
                 id: game.id,
-                item: jade.renderFile(app.get('views') + '/game/list-item.jade', {game: game})
+                item: jade.renderFile(viewsPath + '/game/list-item.jade', {game: game})
             });
 
             return game;
@@ -110,7 +164,7 @@ module.exports = function (app) {
 
             this.event('game.setting.changed', {
                 id: id,
-                item: jade.renderFile(app.get('views') + '/game/list-item.jade', {game: game})
+                item: jade.renderFile(viewsPath + '/game/list-item.jade', {game: game})
             });
         },
 
