@@ -47,6 +47,7 @@ block script
         var avatar = $(".avatar-select .avatar.btn-primary img").attr("src");
 
         global.emit('user.save', {name: name, avatar: avatar});
+        global.button($(event.target), 'Успех');
 
         $('#avatarsCollapse').collapse('hide');
     }
