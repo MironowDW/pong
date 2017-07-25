@@ -94,6 +94,25 @@ module.exports = function (app) {
         getGame: function (id) {
             return this.games[id];
         },
+        updateGame: function (id, data) {
+            var game = this.getGame(id);
+
+            if (!game) {
+                return;
+            }
+
+            // Нечего изменять
+            if (game.setting.access == data.setting.access) {
+                return;
+            }
+
+            game.setting.access = data.setting.access;
+
+            this.event('game.setting.changed', {
+                id: id,
+                item: jade.renderFile(app.get('views') + '/game/list-item.jade', {game: game})
+            });
+        },
 
         emits: [],
         setIo: function (io) {

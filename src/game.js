@@ -16,6 +16,12 @@ exports.initSocket = function (socket, state) {
         callback(game);
     });
 
+    socket.on('game.setting.save', function (data) {
+        state.updateGame(data.id, data);
+
+        console.log('Game setting saved');
+    });
+
     socket.on('game.ready', function (gameId) {
         var game = state.getGame(gameId);
         var user = state.getUserBySocketId(socket.id);
@@ -66,7 +72,10 @@ function Game() {
         user2: null,
         userReady1: false,
         userReady2: false,
-        status: 'new'
+        status: 'new',
+        setting: {
+            access: 'url'
+        }
     };
 }
 

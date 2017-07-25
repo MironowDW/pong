@@ -14,3 +14,7 @@ script(type='text/javascript').
 
       $("#game-list").append(response.item);
   });
+
+  global.on('game.setting.changed', function (response) {
+      $("#game_" + response.id).replaceWith(response.item);
+  });

@@ -5,7 +5,7 @@ block content
     div.col-sm-3
       include ../user/online-list
     div.col-sm-6
-      a.btn.btn-primary.mb-3(style="width:100%" href="#" onclick="createGame(event)") Создать игру
+      a.btn.btn-primary.mb-3.btn-block(href="#" onclick="createGame(event)") Создать игру
       div.card
         div.card-block
           h4.card-title.m-0 Кто ты?
@@ -27,7 +27,7 @@ block content
               a.btn.text-muted(data-toggle="collapse" href="#avatarsCollapse" aria-expanded="false" aria-controls="avatarsCollapse") Все аватарочки
           div.form-group.row.mb-0
             div.col-sm-12
-              a.btn.btn-outline-primary(href="#" onclick="saveUser(event)" style="width: 100%") Сохранить
+              a.btn.btn-outline-primary.btn-block(href="#" onclick="saveUser(event)") Сохранить
     div.col-sm-3
       include ../game/list
 

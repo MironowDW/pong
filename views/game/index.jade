@@ -21,14 +21,14 @@ block content
         div.card
           div.card-block
             h4.card-title Настройки
-            div.form-group
+            div.form-group#setting-access
               label Доступ
               select.form-control
-                option по прямой ссылке
-                option всем
+                option(value="url" selected=game.setting.access == "url") по прямой ссылке
+                option(value="all" selected=game.setting.access == "all") всем
             div.form-group.row.mb-0
               div.col-sm-12
-                a.btn.btn-outline-primary(href="#" onclick="saveUser(event)" style="width: 100%") Сохранить
+                a.btn.btn-outline-primary.btn-block(href="#" onclick="saveGame(event)") Сохранить
       div.col-sm-6
         div.row
           div.col-sm-12
@@ -92,6 +92,17 @@ block content
           $("#score1").text(score['1']);
           $("#score2").text(score['2']);
       });
+
+      function saveGame(event) {
+          event.preventDefault();
+
+          var access = $("#setting-access option:selected").val();
+          if (!access) {
+              return;
+          }
+
+          global.emit('game.setting.save', {id: gameId, setting: {access: access}});
+      }
 
       function startTimer(start, callback) {
           setTime(start);
