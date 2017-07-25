@@ -102,6 +102,8 @@ block content
           }
 
           global.emit('game.setting.save', {id: gameId, setting: {access: access}});
+
+          global.button($(event.target), 'Успех');
       }
 
       function startTimer(start, callback) {

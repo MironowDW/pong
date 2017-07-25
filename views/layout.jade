@@ -83,3 +83,11 @@ html
       $(function () {
           $('[data-toggle="tooltip"]').tooltip()
       });
+
+      global.button = function (el, savedText) {
+          var originalText = el.removeClass('btn-outline-primary').addClass('btn-success').text();
+          el.text(savedText);
+          setTimeout(function () {
+              el.addClass('btn-outline-primary').removeClass('btn-success').text(originalText);
+          }, 500);
+      };
