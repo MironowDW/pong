@@ -361,6 +361,7 @@ function Room(game, user1, user2, io) {
             io.to(user2.socketId).emit('t', state);
 
             var room = this;
+            // TODO 60?
             setTimeout(function () {room.tick()}, 1000 / 60)
         },
 

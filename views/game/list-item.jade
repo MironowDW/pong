@@ -1,14 +1,10 @@
-li.list-group-item(id='game_' + game.id data-user1-id=game.userId1 data-user2-id=game.userId2)
-  div.row
+li.list-group-item(id='game_' + game.id)
+  a(href="/game/" + game.id style="color: black;text-decoration: none;").row
     div.col-5
       img.avatar(src=game.user1.avatar height="30px")
       span.name #{game.user1.name}
-    div.col-2
-        a.for-users-inline(href="/game/" + game.id title="Перейти в игру" data-toggle="tooltip" data-placement="top") vs
-        span.for-others-inline vs
+    div.col-2 vs
     div.col-5.text-right
       if game.user2
         span.name #{game.user2.name}
         img.avatar(src=game.user2.avatar height="30px")
-      if !game.user2 && game.setting.access == "all"
-        a.for-others-inline(href="#") вступить

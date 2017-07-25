@@ -24,23 +24,6 @@ html
           }
       };
 
-    style.
-      /* изначально все скрываем */
-      .for-users-inline, .for-others-inline {
-          display: none;
-      }
-
-      /* отображаем для участников игры */
-      [data-user1-id="#{currentUserId}"] .for-users-inline, [data-user2-id="#{currentUserId}"] .for-users-inline {
-          display: inline;
-      }
-
-      /* отображаем для НЕ участников игры */
-      [data-user1-id]:not([data-user1-id="#{currentUserId}"]) .for-others-inline,
-      [data-user2-id]:not([data-user2-id="#{currentUserId}"]) .for-others-inline {
-          display: inline;
-      }
-
   block script
 
   body(style="background-color:black")
