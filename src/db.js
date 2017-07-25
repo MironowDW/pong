@@ -1,20 +1,16 @@
-exports.init = function (loki, file) {
-    var lokiDb = new loki(file, {env: 'NODEJS', autosave: true, autosaveInterval: 4000, autoload: true});
+var loki = require('lokijs');
 
-    return {
-        loki: lokiDb,
+var db = new loki('db/loki.json', {env: 'NODEJS', autosave: true, autosaveInterval: 4000, autoload: true});
 
-        user: function () {
-            return this.collection('user');
-        },
+exports.user = function () {
+    return this.collection('user');
+};
 
-        collection: function (name) {
-            var collection = this.loki.getCollection(name);
-            if (collection) {
-                return collection;
-            }
+exports.collection = function (name) {
+    var collection = db.getCollection(name);
+    if (collection) {
+        return collection;
+    }
 
-            return this.loki.addCollection(name);
-        }
-    };
+    return db.addCollection(name);
 };

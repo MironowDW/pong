@@ -1,5 +1,6 @@
 var jade = require("jade");
 var gameService = require("../game");
+var userModule = require('../user');
 
 exports.index = function (request, response) {
     var state = request.app.get('state');
@@ -34,8 +35,8 @@ exports.index = function (request, response) {
         return;
     }
 
-    var user1 = state.user.findById(game.userId1);
-    var user2 = game.userId2 ? state.user.findById(game.userId2) : null;
+    var user1 = userModule.findById(game.userId1);
+    var user2 = game.userId2 ? userModule.findById(game.userId2) : null;
 
     response.render('game/index', {
         user1: user1,
