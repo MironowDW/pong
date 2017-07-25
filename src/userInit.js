@@ -1,7 +1,6 @@
 var userModule = require('./user');
 
 exports.init = function (request, response, next) {
-    var state = request.app.get('state');
     var hash = request.cookies.user_hash;
     var user = userModule.findByHash(hash);
 

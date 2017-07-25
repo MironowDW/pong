@@ -8,11 +8,10 @@ var userModule = require('./user');
 /**
  * Иницализирует socket на переданном хосте и порту
  */
-exports.init = function (host, port, state) {
+exports.init = function (host, port) {
     var server = http.createServer();
     server.listen(port, host);
     io = io.listen(server);
-    state.setIo(io);
 
     emitter.setIo(io);
 
@@ -29,7 +28,7 @@ exports.init = function (host, port, state) {
             console.log('User inited: ', currentUser);
 
             user.initSocket(socket);
-            game.initSocket(socket, state);
+            game.initSocket(socket, io);
 
             // Отвязываем пользователя от socketId
             socket.on('disconnect', function () {

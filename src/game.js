@@ -1,38 +1,42 @@
 var shortid = require('shortid');
 var userModule = require('./user');
+var gameModule = require('./game');
+var render = require('./render');
+var emitter = require('./emitter');
+var db = require('./db');
+
+// TODO Куда убрать?
+var rooms = {};
 
 exports.getSceneConfig = getSceneConfig;
 
-exports.initSocket = function (socket, state) {
+exports.initSocket = function (socket, io) {
+    var module = this;
+
     socket.on('game.create', function (data, callback) {
         var user = userModule.findBySocketId(socket.id);
 
-        var game = new Game();
-        game.id = shortid();
-        game.userId1 = user.id;
-        game.user1 = user;
-
-        game = state.addGame(game);
+        game = module.createGame(user);
 
         callback(game);
     });
 
     socket.on('game.setting.save', function (data) {
-        state.updateGame(data.id, data);
+        gameModule.update(data.id, data);
 
         console.log('Game setting saved');
     });
 
     socket.on('game.ready', function (gameId) {
-        var game = state.getGame(gameId);
+        var game = gameModule.findById(gameId);
         var user = userModule.findBySocketId(socket.id);
 
         if (game.userId1 == user.id) {
-            game.userReady1 = true;
+            game = module._update(game.id, {userReady1: true});
         }
 
         if (game.userId2 == user.id) {
-            game.userReady2 = true;
+            game = module._update(game.id, {userReady2: true});
         }
 
         // Все готовы, поехали
@@ -40,28 +44,132 @@ exports.initSocket = function (socket, state) {
             var user1 = userModule.findById(game.userId1);
             var user2 = userModule.findById(game.userId2);
 
-            var room = new Room(game, user1, user2, state.io);
+            var room = new Room(game, user1, user2, io);
             room.start();
 
-            state.rooms[gameId] = room;
+            rooms[gameId] = room;
         }
     });
 
     socket.on('ls', function (data) {
-        state.rooms[data.g].players[data.u].startLeft = true;
+        rooms[data.g].players[data.u].startLeft = true;
     });
 
     socket.on('rs', function (data) {
-        state.rooms[data.g].players[data.u].startRight = true;
+        rooms[data.g].players[data.u].startRight = true;
     });
 
     socket.on('le', function (data) {
-        state.rooms[data.g].players[data.u].startLeft = false;
+        rooms[data.g].players[data.u].startLeft = false;
     });
 
     socket.on('re', function (data) {
-        state.rooms[data.g].players[data.u].startRight = false;
+        rooms[data.g].players[data.u].startRight = false;
     });
+};
+
+exports.createGame = function (user) {
+    var dbGame = db.game().insert({
+        userId1: user.id,
+        userId2: null,
+        userReady1: false,
+        userReady2: false,
+        status: 'new',
+        setting: {access: 'url'}
+    });
+    var game = this.wrap(dbGame);
+
+    emitter.event('game.add', {
+        id: game.id,
+        item: render.file('/game/list-item.jade', {game: game})
+    });
+
+    return game;
+};
+
+exports.findById = function (id) {
+    return this.wrap(db.game().get(id));
+};
+
+exports.findAll = function () {
+    var dbGames = db.game().find();
+    var games = [];
+
+    for (var i in dbGames) {
+        games.push(this.wrap(dbGames[i]));
+    }
+
+    return games;
+};
+
+exports.update = function (id, data) {
+    var dbGame = db.game().get(id);
+    if (!dbGame) {
+        return;
+    }
+
+    if (dbGame.setting.access == data.setting.access) {
+        return;
+    }
+
+    dbGame.setting.access = data.setting.access;
+
+    db.game().update(dbGame);
+
+    emitter.event('game.setting.changed', {
+        id: id,
+        item: render.file('/game/list-item.jade', {game: game})
+    });
+};
+
+exports._update = function (id, data) {
+    var dbGame = db.game().get(id);
+    if (!dbGame) {
+        return;
+    }
+
+    if (data.userReady1) {
+        dbGame.userReady1 = data.userReady1;
+    }
+
+    if (data.userReady2) {
+        dbGame.userReady2 = data.userReady2;
+    }
+
+    if (data.userId2) {
+        dbGame.userId2 = data.userId2;
+    }
+
+    if (data.user2) {
+        dbGame.user2 = data.user2;
+    }
+
+    db.game().update(dbGame);
+
+    return this.wrap(dbGame);
+};
+
+exports.wrap = function (dbGame) {
+    if (!dbGame) {
+        return null;
+    }
+
+    var game = new Game();
+    game.id = dbGame['$loki'];
+    game.userId1 = dbGame.userId1;
+    game.userId2 = dbGame.userId2;
+    game.userReady1 = dbGame.userReady1;
+    game.userReady2 = dbGame.userReady2;
+
+    if (dbGame.userId1) {
+        game.user1 = userModule.findById(dbGame.userId1);
+    }
+
+    if (dbGame.userId2) {
+        game.user2 = userModule.findById(dbGame.userId2);
+    }
+
+    return game;
 };
 
 function Game() {
@@ -209,7 +317,7 @@ function Room(game, user1, user2, io) {
 
         width: config.width,
         height: config.height,
-        board: config.width.board,
+        board: config.board,
 
         socket1: user1.socketId,
         socket2: user2.socketId,

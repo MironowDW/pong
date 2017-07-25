@@ -15,10 +15,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Глобальное состояние, все объекты будут храниться тут
-var state = require('./src/state');
-app.set('state', new state(app.get('views'), app.get('db')));
-
 // Инициализируем текущего пользователя при каждом подключении
 var user = require('./src/userInit');
 app.use(user.init);

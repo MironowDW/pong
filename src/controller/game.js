@@ -1,11 +1,12 @@
 var jade = require("jade");
 var gameService = require("../game");
 var userModule = require('../user');
+var gameModule = require('../game');
+var emitter = require('../emitter');
 
 exports.index = function (request, response) {
-    var state = request.app.get('state');
     var id = request.params.id;
-    var game = state.getGame(id);
+    var game = gameModule.findById(id);
     var isNewUser = 0;
 
     if (!game) {
@@ -17,9 +18,10 @@ exports.index = function (request, response) {
 
     // Кто-то зашел в игру, делаем его вторым игроком
     if (!isUser1 && !game.userId2) {
-        game.userId2 = request.user.id;
-        game.user2 = request.user;
-        state.event('game.change', {
+        // TODO Перенести это в game
+        game = gameModule._update(game.id, {userId2: request.user.id, user2: request.user});
+
+        emitter.event('game.change', {
             type: 'ready',
             item: jade.renderFile(request.app.get('views') + '/game/user2-item.jade', {user2: request.user}),
             game: game

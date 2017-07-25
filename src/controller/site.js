@@ -1,6 +1,7 @@
 const fs = require('fs');
 const shuffle = require('shuffle-array');
 var userModule = require('../user');
+var gameModule = require('../game');
 
 /**
  * Отображение панели
@@ -9,7 +10,6 @@ var userModule = require('../user');
  * @param response
  */
 exports.index = function (request, response) {
-    var state = request.app.get('state');
     var user = request.user;
     var avatars = getAvatars(user);
 
@@ -17,7 +17,7 @@ exports.index = function (request, response) {
 
     response.render('site/index', {
         users: userModule.findOnline(),
-        games: state.games,
+        games: gameModule.findAll(),
         name: name,
         avatars: avatars
     });

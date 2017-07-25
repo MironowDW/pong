@@ -6,6 +6,10 @@ exports.user = function () {
     return this.collection('user');
 };
 
+exports.game = function () {
+    return this.collection('game');
+};
+
 exports.collection = function (name) {
     var collection = db.getCollection(name);
     if (collection) {
