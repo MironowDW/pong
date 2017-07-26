@@ -3,7 +3,8 @@ var userTable = require('./table');
 /**
  * При инициализации сокета текущего пользователя инициализируем события
  */
-module.exports = function (socket, userId) {
+module.exports = function (socket, hash) {
+    var userId = userTable.findByHash(hash).id;
 
     // Привязываем сокет к пользователю
     userTable.update(userId, {socketId: socket.id});

@@ -7,8 +7,8 @@ module.exports = function (io) {
 
     io.sockets.on('connection', function (socket) {
         // Собитие после которого можно работать
-        socket.on('user.init', function (userId, callback) {
-            userOnSocketInit(socket, userId);
+        socket.on('user.init', function (hash, callback) {
+            userOnSocketInit(socket, hash);
             gameOnSocketInit(socket, io);
 
             callback();

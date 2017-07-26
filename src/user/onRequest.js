@@ -17,9 +17,6 @@ module.exports = function (request, response, next) {
 
     request.user = user;
 
-    // TODO Это точно нужно и как это работает для разных пользователей?
-    request.app.locals.currentUserId = user.id;
-
     if (user.status == 'offline') {
         userTable.update(user.id, {status: 'online'});
     }

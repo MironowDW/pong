@@ -13,7 +13,6 @@ html
 
     script(type='text/javascript').
       global = {
-          userId: null,
           socket: null,
           ons: [],
 
@@ -31,19 +30,17 @@ html
       block content
 
   script(type='text/javascript').
-      var socketHost = "#{socketHost}";
-      var socketPort = "#{socketPort}";
-      global.userId = parseInt("#{currentUserId}");
+      var hash = Cookies.get('user_hash');
 
-      if (!global.userId) {
+      if (!hash) {
           alert('Пользователь не инициализирован, перезагрузите страничку');
       }
 
-      if (global.userId) {
-          var socket = io.connect(socketHost + ':' + socketPort);
+      if (hash) {
+          var socket = io.connect("#{socketHost}" + ':' + "#{socketPort}");
 
           // Начинаем работу только после проверки пользователя
-          socket.emit('user.init', global.userId, function () {
+          socket.emit('user.init', hash, function () {
               global.socket = socket;
               global.emit = function (event, message, callback) {
                   socket.emit(event, message, callback);

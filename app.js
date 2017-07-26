@@ -35,12 +35,6 @@ app.use(require('./src/user/onRequest'));
 app.get('/', require('./src/app/controller').index);
 app.get('/game/:id', require('./src/game/controller').index);
 
-// TODO Зарефакторить
-// var newGame = require('./routes/new_game');
-// var game = require('./routes/game');
-// app.use(newGame);
-// app.use(game);
-
 // Обработка 404
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
