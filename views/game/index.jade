@@ -57,13 +57,9 @@ block content
       });
 
       global.on('game.change', function (response) {
-          console.log(response);
           if (response.id != gameId) {
               return;
           }
-
-          console.log($("#user2-item"));
-          console.log(response.item);
 
           $("#user2-item").html(response.item);
       });
@@ -88,10 +84,16 @@ block content
           scene.update(state);
       });
 
+      // Изменение очков
       global.on('s', function (score) {
           $("#score1").text(score['1']);
           $("#score2").text(score['2']);
       });
+
+      // Кто-то победил
+      //global.on('e', function () {
+
+      //});
 
       function startTimer(start, callback) {
           setTime(start);

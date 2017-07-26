@@ -89,10 +89,10 @@ function Ball(room, x, y) {
             if (this.y < 0 || this.y > room.height) {
                 if (this.y < 0) {
                     this.y_speed = 3 * 2;
-                    player2.score++;
+                    player1.score++;
                 } else {
                     this.y_speed = -(3 * 2);
-                    player1.score++;
+                    player2.score++;
                 }
 
                 this.x_speed = 0;
