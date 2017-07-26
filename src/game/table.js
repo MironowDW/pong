@@ -75,10 +75,6 @@ exports._update = function (id, data) {
         dbGame.userId2 = data.userId2;
     }
 
-    if (data.user2) {
-        dbGame.user2 = data.user2;
-    }
-
     if (data.status) {
         dbGame.status = data.status;
     }
@@ -99,14 +95,8 @@ wrap = function (dbGame) {
     game.userId2 = dbGame.userId2;
     game.userReady1 = dbGame.userReady1;
     game.userReady2 = dbGame.userReady2;
-
-    if (dbGame.userId1) {
-        game.user1 = userTable.findById(dbGame.userId1);
-    }
-
-    if (dbGame.userId2) {
-        game.user2 = userTable.findById(dbGame.userId2);
-    }
+    game.status = dbGame.status;
+    game.setting = dbGame.setting;
 
     return game;
 };
@@ -116,8 +106,12 @@ function Game() {
         id: null,
         userId1: null, // Создатель
         userId2: null,
-        user1: null,
-        user2: null,
+        user1: function () {
+            return this.userId1 ? userTable.findById(this.userId1) : {};
+        },
+        user2: function () {
+            return this.userId2 ? userTable.findById(this.userId2) : {};
+        },
         userReady1: false,
         userReady2: false,
         status: 'new', // new - только создали, full - добавился 2 пользователь, go - началась, end - закончилась
