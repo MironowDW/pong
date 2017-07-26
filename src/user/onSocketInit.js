@@ -3,10 +3,10 @@ var userTable = require('./table');
 /**
  * При инициализации сокета текущего пользователя инициализируем события
  */
-module.exports = function (socket, userid) {
+module.exports = function (socket, userId) {
 
     // Привязываем сокет к пользователю
-    userTable.update(userid, {socketId: socket.id});
+    userTable.update(userId, {socketId: socket.id});
 
     socket.on('user.save', function (data) {
         var user = userTable.findBySocketId(socket.id);
@@ -17,15 +17,14 @@ module.exports = function (socket, userid) {
 
     socket.on('disconnect', function () {
         // Отвязываем пользователя от socketId
-        var user = userTable.findBySocketId(socket.id);
-        userTable.update(user.id, {socketId: null});
+        userTable.update(userId, {socketId: null});
 
         // Если через 5 секунд после отсоединения пользователь не вернулся, считаем его offline
         // Такое может быть при обновление странички
         setTimeout(function () {
-            var user = userTable.findBySocketId(socket.id);
+            var user = userTable.findById(userId);
 
-            if (user.socketId) {
+            if (user && user.socketId) {
                 return;
             }
 

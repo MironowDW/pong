@@ -1,11 +1,11 @@
 var jade = require("jade");
-var gameService = require("../game");
 var userTable = require('../user/table');
-var gameModule = require('../game');
+var gameTable = require('../game/table');
+var gameConfig = require("../game/config");
 var emitter = require('../common/emitter');
 
 exports.index = function (request, response) {
-    var game = gameModule.findById(request.params.id);
+    var game = gameTable.findById(request.params.id);
     if (!game) {
         response.render('game/error', {message: 'Игра не найдена'});
         return;
@@ -33,7 +33,7 @@ exports.index = function (request, response) {
     // Кто-то зашел в игру, делаем его вторым игроком
     if (!isUser1 && !game.userId2) {
         // TODO Перенести это в game
-        game = gameModule._update(game.id, {userId2: request.user.id, user2: request.user, status: 'full'});
+        game = gameTable._update(game.id, {userId2: request.user.id, user2: request.user, status: 'full'});
 
         emitter.event('game.change', {
             type: 'ready',
@@ -60,6 +60,6 @@ exports.index = function (request, response) {
         game: game,
         isNewUser: isNewUser,
         userId: request.user.id,
-        sceneConfig: gameService.getSceneConfig()
+        sceneConfig: gameConfig
     });
 };

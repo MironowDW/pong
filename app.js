@@ -24,7 +24,7 @@ var socketPort = process.env.SOCKET_PORT || 3030;
 app.locals.socketHost = socketHost;
 app.locals.socketPort = socketPort;
 var socket = require('./src/socket');
-socket.init(socketHost, socketPort, app.get('state'));
+socket.init(socketHost, socketPort);
 
 var site = require('./src/controller/site');
 var game = require('./src/controller/game');

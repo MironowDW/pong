@@ -1,7 +1,7 @@
 var http = require('http');
 var io = require('socket.io');
 var userOnSocketInit = require('./user/onSocketInit');
-var game = require('./game');
+var gameOnSocketInit = require('./game/onSocketInit');
 var emitter = require('./common/emitter');
 
 /**
@@ -18,7 +18,7 @@ exports.init = function (host, port) {
         // Собитие после которого можно работать с соединением
         socket.on('user.init', function (userid, callback) {
             userOnSocketInit(socket, userid);
-            game.initSocket(socket, io);
+            gameOnSocketInit(socket, io);
 
             callback();
         });
