@@ -1,7 +1,7 @@
 var jade = require("jade");
 var userTable = require('../user/table');
-var gameTable = require('../game/table');
-var gameConfig = require("../game/config");
+var gameTable = require('./table');
+var gameConfig = require("./config");
 var emitter = require('../common/emitter');
 
 exports.index = function (request, response) {
@@ -47,7 +47,7 @@ exports.index = function (request, response) {
 
     // Игра уже готова и пришел кто-то третий
     if (!isUser1 && !isUser2) {
-        response.render('game/error', {message: 'Игар уже идет, третий лишний'});
+        response.render('game/error', {message: 'Игра уже идет, третий лишний'});
         return;
     }
 
