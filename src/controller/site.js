@@ -1,6 +1,6 @@
 const fs = require('fs');
 const shuffle = require('shuffle-array');
-var userModule = require('../user');
+var userTable = require('../user/table');
 var gameModule = require('../game');
 
 /**
@@ -16,7 +16,7 @@ exports.index = function (request, response) {
     var name = user.name == 'без имени' ? '' : user.name;
 
     response.render('site/index', {
-        users: userModule.findOnline(),
+        users: userTable.findOnline(),
         games: gameModule.findAll(),
         name: name,
         avatars: avatars

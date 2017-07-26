@@ -31,27 +31,19 @@ html
       block content
 
   script(type='text/javascript').
-      var hash = Cookies.get('user_hash');
       var socketHost = "#{socketHost}";
       var socketPort = "#{socketPort}";
       global.userId = parseInt("#{currentUserId}");
 
-      if (!hash) {
+      if (!global.userId) {
           alert('Пользователь не инициализирован, перезагрузите страничку');
       }
 
-      if (hash) {
+      if (global.userId) {
           var socket = io.connect(socketHost + ':' + socketPort);
 
           // Начинаем работу только после проверки пользователя
-          socket.emit('user.init', hash, function (user) {
-              if (!user) {
-                  alert('Пользователь не инициализирован, перезагрузите страничку');
-                  return false;
-              }
-
-              console.log('User inited', user);
-
+          socket.emit('user.init', global.userId, function () {
               global.socket = socket;
               global.emit = function (event, message, callback) {
                   socket.emit(event, message, callback);

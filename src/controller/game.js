@@ -1,25 +1,39 @@
 var jade = require("jade");
 var gameService = require("../game");
-var userModule = require('../user');
+var userTable = require('../user/table');
 var gameModule = require('../game');
-var emitter = require('../emitter');
+var emitter = require('../common/emitter');
 
 exports.index = function (request, response) {
-    var id = request.params.id;
-    var game = gameModule.findById(id);
-    var isNewUser = 0;
-
+    var game = gameModule.findById(request.params.id);
     if (!game) {
-        response.render('game/no');
+        response.render('game/error', {message: 'Игра не найдена'});
         return;
     }
+
+    switch (game.status) {
+        case 'new': // только создали
+
+            break;
+        case 'full': // добавился 2 пользователь
+
+            break;
+        case 'go': // началась
+
+            break;
+        case 'end': // закончилась
+
+            break;
+    }
+
+    var isNewUser = 0;
 
     var isUser1 = request.user.id == game.userId1;
 
     // Кто-то зашел в игру, делаем его вторым игроком
     if (!isUser1 && !game.userId2) {
         // TODO Перенести это в game
-        game = gameModule._update(game.id, {userId2: request.user.id, user2: request.user});
+        game = gameModule._update(game.id, {userId2: request.user.id, user2: request.user, status: 'full'});
 
         emitter.event('game.change', {
             type: 'ready',
@@ -33,12 +47,12 @@ exports.index = function (request, response) {
 
     // Игра уже готова и пришел кто-то третий
     if (!isUser1 && !isUser2) {
-        response.render('game/denied');
+        response.render('game/error', {message: 'Игар уже идет, третий лишний'});
         return;
     }
 
-    var user1 = userModule.findById(game.userId1);
-    var user2 = game.userId2 ? userModule.findById(game.userId2) : null;
+    var user1 = userTable.findById(game.userId1);
+    var user2 = game.userId2 ? userTable.findById(game.userId2) : null;
 
     response.render('game/index', {
         user1: user1,

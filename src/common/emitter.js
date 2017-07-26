@@ -1,7 +1,7 @@
 var emits = [];
 var socketIo = null;
 
-exports.setIo = function (io) {
+exports.init = function (io) {
     socketIo = io;
 
     for (var i in emits) {

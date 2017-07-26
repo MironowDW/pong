@@ -1,18 +1,7 @@
 var shortid = require('shortid');
-var render = require('./render');
-var emitter = require('./emitter');
-var db = require('./db');
-
-exports.initSocket = function (socket) {
-    var module = this;
-
-    socket.on('user.save', function (data) {
-        var user = module.findBySocketId(socket.id);
-        module.update(user.id, data);
-
-        console.log('User saved', data);
-    });
-};
+var render = require('../common/render');
+var emitter = require('../common/emitter');
+var db = require('../common/db');
 
 /**
  * @returns {User[]}
@@ -22,7 +11,7 @@ exports.findOnline = function () {
     var users = [];
 
     for (var i in dbUsers) {
-        users.push(this.wrap(dbUsers[i]));
+        users.push(wrap(dbUsers[i]));
     }
 
     return users;
@@ -32,42 +21,21 @@ exports.findOnline = function () {
  * @returns {User}
  */
 exports.findById = function(id) {
-    return this.wrap(db.user().get(id));
+    return wrap(db.user().get(id));
 };
 
 /**
  * @returns {User}
  */
 exports.findByHash = function(hash) {
-    return this.wrap(db.user().findOne({hash: hash}));
+    return wrap(db.user().findOne({hash: hash}));
 };
 
 /**
  * @returns {User}
  */
 exports.findBySocketId = function (socketId) {
-    return this.wrap(db.user().findOne({socketId: socketId}));
-};
-
-/**
- * @returns {User}
- */
-exports.generate = function () {
-    var dbUser = db.user().insert({
-        name: 'без имени',
-        hash: shortid.generate(),
-        avatar: '',
-        status: 'online',
-        socketId: null
-    });
-    var user = this.wrap(dbUser);
-
-    emitter.event('user.add', {
-        id: user.id,
-        'online-item': render.file('/user/online-item.jade', {user: user})
-    });
-
-    return user;
+    return wrap(db.user().findOne({socketId: socketId}));
 };
 
 /**
@@ -111,13 +79,36 @@ exports.update = function (id, data) {
         });
     }
 
-    return this.wrap(dbUser);
+    return wrap(dbUser);
+};
+
+//////// TODO Тут ли место всему что ниже?
+
+/**
+ * @returns {User}
+ */
+exports.generate = function () {
+    var dbUser = db.user().insert({
+        name: 'без имени',
+        hash: shortid.generate(),
+        avatar: '',
+        status: 'online',
+        socketId: null
+    });
+    var user = wrap(dbUser);
+
+    emitter.event('user.add', {
+        id: user.id,
+        'online-item': render.file('/user/online-item.jade', {user: user})
+    });
+
+    return user;
 };
 
 /**
  * @returns {User}
  */
-exports.wrap = function (dbUser) {
+function wrap(dbUser) {
     if (!dbUser) {
         return null;
     }
@@ -131,7 +122,7 @@ exports.wrap = function (dbUser) {
     model.socketId = dbUser.socketId;
 
     return model;
-};
+}
 
 function User() {
     return {

@@ -15,9 +15,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Инициализируем текущего пользователя при каждом подключении
-var user = require('./src/userInit');
-app.use(user.init);
+// Инициализация модуля пользователей
+app.use(require('./src/user/onRequest'));
 
 // Инициализируем сокет
 var socketHost = process.env.SOCKET_HOST || '127.0.0.1';

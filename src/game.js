@@ -1,9 +1,8 @@
 var shortid = require('shortid');
-var userModule = require('./user');
-var gameModule = require('./game');
-var render = require('./render');
-var emitter = require('./emitter');
-var db = require('./db');
+var userTable = require('./user/table');
+var render = require('./common/render');
+var emitter = require('./common/emitter');
+var db = require('./common/db');
 
 // TODO Куда убрать?
 var rooms = {};
@@ -14,7 +13,7 @@ exports.initSocket = function (socket, io) {
     var module = this;
 
     socket.on('game.create', function (data, callback) {
-        var user = userModule.findBySocketId(socket.id);
+        var user = userTable.findBySocketId(socket.id);
 
         game = module.createGame(user);
 
@@ -22,14 +21,14 @@ exports.initSocket = function (socket, io) {
     });
 
     socket.on('game.setting.save', function (data) {
-        gameModule.update(data.id, data);
+        module.update(data.id, data);
 
         console.log('Game setting saved');
     });
 
     socket.on('game.ready', function (gameId) {
-        var game = gameModule.findById(gameId);
-        var user = userModule.findBySocketId(socket.id);
+        var game = module.findById(gameId);
+        var user = userTable.findBySocketId(socket.id);
 
         if (game.userId1 == user.id) {
             game = module._update(game.id, {userReady1: true});
@@ -41,8 +40,10 @@ exports.initSocket = function (socket, io) {
 
         // Все готовы, поехали
         if (game.userReady1 && game.userReady2) {
-            var user1 = userModule.findById(game.userId1);
-            var user2 = userModule.findById(game.userId2);
+            var user1 = userTable.findById(game.userId1);
+            var user2 = userTable.findById(game.userId2);
+
+            game = module._update(game.id, {status: 'go'});
 
             var room = new Room(game, user1, user2, io);
             room.start();
@@ -144,6 +145,10 @@ exports._update = function (id, data) {
         dbGame.user2 = data.user2;
     }
 
+    if (data.status) {
+        dbGame.status = data.status;
+    }
+
     db.game().update(dbGame);
 
     return this.wrap(dbGame);
@@ -162,11 +167,11 @@ exports.wrap = function (dbGame) {
     game.userReady2 = dbGame.userReady2;
 
     if (dbGame.userId1) {
-        game.user1 = userModule.findById(dbGame.userId1);
+        game.user1 = userTable.findById(dbGame.userId1);
     }
 
     if (dbGame.userId2) {
-        game.user2 = userModule.findById(dbGame.userId2);
+        game.user2 = userTable.findById(dbGame.userId2);
     }
 
     return game;
@@ -181,7 +186,7 @@ function Game() {
         user2: null,
         userReady1: false,
         userReady2: false,
-        status: 'new',
+        status: 'new', // new - только создали, full - добавился 2 пользователь, go - началась, end - закончилась
         setting: {
             access: 'url'
         }
@@ -344,6 +349,9 @@ function Room(game, user1, user2, io) {
 
         stop: function () {
             this.emergencyBrake = true;
+
+            // TODO
+            // game = module._update(game.id, {status: 'end'});
         },
 
         tick: function () {
