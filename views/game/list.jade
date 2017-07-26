@@ -6,7 +6,7 @@ div.card
       include ./list-item
 script(type='text/javascript').
   global.on('game.add', function (response) {
-      var item = $("#game_" + response.id);
+      var item = $(".game_" + response.id);
       if (item.length) {
           item.replaceWith(response.item);
           return;
@@ -16,5 +16,5 @@ script(type='text/javascript').
   });
 
   global.on('game.setting.changed', function (response) {
-      $("#game_" + response.id).replaceWith(response.item);
+      $(".game_" + response.id).replaceWith(response.item);
   });

@@ -1,4 +1,4 @@
-li.list-group-item(id='user_' + user.id)
+li.list-group-item(class='user_' + user.id)
   if user.avatar != ''
     img.avatar(src=user.avatar height="30px")
   span.name #{user.name}

@@ -7,7 +7,7 @@ div.card
         include ./online-item
 script(type='text/javascript').
   global.on('user.changed', function (response) {
-      var el = $("#user_" + response.user.id);
+      var el = $(".user_" + response.user.id);
 
       // Пользователь ушел в offline, удаляем его
       if (response.user.status == 'offline') {
@@ -29,7 +29,7 @@ script(type='text/javascript').
 
   global.on('user.add', function (response) {
       //Пользователь уже есть
-      var userItem = $("#user_" + response.id);
+      var userItem = $(".user_" + response.id);
       if (userItem.length) {
           userItem.replaceWith(response['online-item']);
           return;
