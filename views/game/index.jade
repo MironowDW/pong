@@ -3,9 +3,9 @@ extends ../layout
 block content
     div.row.mb-3(style="min-height: 95px")
         div.col-sm-5.text-white.font-weight-bold.text-right
-            span.name #{user1.name}
-            if user1.avatar
-                img.avatar(src=user1.avatar height="100px")
+            span.name #{game.user1().name}
+            if game.user1().avatar
+                img.avatar(src=game.user1().avatar height="100px")
         div.col-sm-2.text-center.text-white
             h2 vs
             h1#timer
@@ -14,21 +14,12 @@ block content
                 span#score-delimeter
                 span#score2
         div.col-sm-5.text-white.font-weight-bold.text-left#user2-item
-            if user2
-                include user2-item
+            if game.userId2
+              include user2-item
+            if canInvite
+              a(href="#" onclick="inviteGame(event)") играть
     div.row
       div.col-sm-3
-        div.card
-          div.card-block
-            h4.card-title Настройки
-            div.form-group#setting-access
-              label Доступ
-              select.form-control
-                option(value="url" selected=game.setting.access == "url") по прямой ссылке
-                option(value="all" selected=game.setting.access == "all") всем
-            div.form-group.row.mb-0
-              div.col-sm-12
-                a.btn.btn-outline-primary.btn-block(href="#" onclick="saveGame(event)") Сохранить
       div.col-sm-6
         div.row
           div.col-sm-12
@@ -36,36 +27,45 @@ block content
       div.col-sm-3
     script(type='text/javascript').
       var gameId = "#{game.id}";
-      var isNewUser = parseInt("#{isNewUser}");
-      var userId = parseInt("#{userId}");
-      var timerStart = 5;
       var isStarted = false;
 
-      var sceneWidth = parseInt("#{sceneConfig.width}");
-      var sceneHeight = parseInt("#{sceneConfig.height}");
-      var sceneBoardWidth = parseInt("#{sceneConfig.board.width}");
-      var sceneBoardHeight = parseInt("#{sceneConfig.board.height}");
+      var sceneWidth = parseInt("#{config.width}");
+      var sceneHeight = parseInt("#{config.height}");
+      var sceneBoardWidth = parseInt("#{config.board.width}");
+      var sceneBoardHeight = parseInt("#{config.board.height}");
 
-      if (isNewUser) {
-          startTimer(timerStart, function () {
-              // Пользователь готов началь игру
-              global.emit('game.ready', gameId);
+      // Попроситься в игру
+      function inviteGame(event) {
+          event.preventDefault();
+
+          // Просимся в игру
+          global.emit('game.invite', gameId, function (isInvited) {
+              if (!isInvited) {
+                  alert('Ошибка при начале игры');
+                  return;
+              }
           });
       }
 
-      global.on('game.change', function (response) {
-          if (response.game.id != gameId) {
+      // Начало обратного отсчета
+      global.on('game.countdown', function (response) {
+          if (response.id != gameId) {
               return;
           }
 
-          if (response.type == 'ready') {
-              $("#user2-item").html(response.item);
+          startTimer(response.seconds);
+      });
 
-              startTimer(timerStart, function () {
-                  // Пользователь готов началь игру
-                  global.emit('game.ready', gameId);
-              });
+      global.on('game.change', function (response) {
+          console.log(response);
+          if (response.id != gameId) {
+              return;
           }
+
+          console.log($("#user2-item"));
+          console.log(response.item);
+
+          $("#user2-item").html(response.item);
       });
 
       global.on('game.start', function (startedGameId) {
@@ -93,19 +93,6 @@ block content
           $("#score2").text(score['2']);
       });
 
-      function saveGame(event) {
-          event.preventDefault();
-
-          var access = $("#setting-access option:selected").val();
-          if (!access) {
-              return;
-          }
-
-          global.emit('game.setting.save', {id: gameId, setting: {access: access}});
-
-          global.button($(event.target), 'Успех');
-      }
-
       function startTimer(start, callback) {
           setTime(start);
 
@@ -117,7 +104,7 @@ block content
               if (start == 0) {
                   clearInterval(intervalId);
                   setTime('');
-                  callback();
+                  callback && callback();
               }
           }, 1000);
 
@@ -184,10 +171,10 @@ block content
                   }
 
                   if (event.keyCode == 37) {
-                      socket.emit('ls', {g: gameId, u: userId}); // left start
+                      socket.emit('ls', gameId); // left start
                   }
                   if (event.keyCode == 39) {
-                      socket.emit('rs', {g: gameId, u: userId}); // right start
+                      socket.emit('rs', gameId); // right start
                   }
               });
 
@@ -197,10 +184,10 @@ block content
                   }
 
                   if (event.keyCode == 37) {
-                      socket.emit('le', {g: gameId, u: userId}); // left end
+                      socket.emit('le', gameId); // left end
                   }
                   if (event.keyCode == 39) {
-                      socket.emit('re', {g: gameId, u: userId}); // right end
+                      socket.emit('re', gameId); // right end
                   }
               });
           }

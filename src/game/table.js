@@ -7,10 +7,7 @@ exports.createGame = function (user) {
     var dbGame = db.game().insert({
         userId1: user.id,
         userId2: null,
-        userReady1: false,
-        userReady2: false,
-        status: 'new',
-        setting: {access: 'url'}
+        status: 'new'
     });
     var game = wrap(dbGame);
 
@@ -39,49 +36,31 @@ exports.findAll = function () {
 
 exports.update = function (id, data) {
     var dbGame = db.game().get(id);
+    var emit = false;
     if (!dbGame) {
         return;
-    }
-
-    if (dbGame.setting.access == data.setting.access) {
-        return;
-    }
-
-    dbGame.setting.access = data.setting.access;
-
-    db.game().update(dbGame);
-
-    emitter.event('game.setting.changed', {
-        id: id,
-        item: render.file('/game/list-item.jade', {game: game})
-    });
-};
-
-exports._update = function (id, data) {
-    var dbGame = db.game().get(id);
-    if (!dbGame) {
-        return;
-    }
-
-    if (data.userReady1) {
-        dbGame.userReady1 = data.userReady1;
-    }
-
-    if (data.userReady2) {
-        dbGame.userReady2 = data.userReady2;
     }
 
     if (data.userId2) {
         dbGame.userId2 = data.userId2;
+        emit = true;
     }
 
     if (data.status) {
         dbGame.status = data.status;
+        emit = true;
     }
 
-    db.game().update(dbGame);
+    var game = wrap(db.game().update(dbGame));
 
-    return wrap(dbGame);
+    if (emit) {
+        emitter.event('game.change', {
+            id: game.id,
+            item: render.file('/game/user2-item.jade', {game: game})
+        });
+    }
+
+    return game;
 };
 
 wrap = function (dbGame) {
@@ -93,10 +72,7 @@ wrap = function (dbGame) {
     game.id = dbGame['$loki'];
     game.userId1 = dbGame.userId1;
     game.userId2 = dbGame.userId2;
-    game.userReady1 = dbGame.userReady1;
-    game.userReady2 = dbGame.userReady2;
     game.status = dbGame.status;
-    game.setting = dbGame.setting;
 
     return game;
 };
@@ -112,11 +88,6 @@ function Game() {
         user2: function () {
             return this.userId2 ? userTable.findById(this.userId2) : {};
         },
-        userReady1: false,
-        userReady2: false,
-        status: 'new', // new - только создали, full - добавился 2 пользователь, go - началась, end - закончилась
-        setting: {
-            access: 'url'
-        }
+        status: 'new'
     };
 }

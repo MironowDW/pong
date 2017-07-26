@@ -2,18 +2,19 @@ var config = require('./config');
 var gameTable = require('./table');
 var userTable = require('../user/table');
 
-var rooms = {};
+// TODO Как-то избавиться нужно
+exports.rooms = {};
 
-module.exports = function (game, io) {
+exports.run = function (game, io) {
     var user1 = userTable.findById(game.userId1);
     var user2 = userTable.findById(game.userId2);
 
-    game = gameTable._update(game.id, {status: 'go'});
+    game = gameTable.update(game.id, {status: 'go'});
 
     var room = new Room(game, user1, user2, io);
     room.start();
 
-    rooms[game.id] = room;
+    this.rooms[game.id] = room;
 };
 
 function Player(room, x, y) {
