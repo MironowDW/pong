@@ -38,6 +38,15 @@ exports.findBySocketId = function (socketId) {
     return wrap(db.user().findOne({socketId: socketId}));
 };
 
+exports.markOffline = function () {
+    var users = db.user().find({status: 'online'});
+
+    for (var i in users) {
+        users[i].status = 'offline';
+        db.user().update(users[i]);
+    }
+};
+
 /**
  * @returns {User}
  */

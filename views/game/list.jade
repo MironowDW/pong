@@ -14,3 +14,14 @@ script(type='text/javascript').
 
       $("#game-list").append(response.item);
   });
+
+  global.on('game.change', function (response) {
+      var item = $(".game_" + response.id);
+      if (!item.length) {
+          return;
+      }
+
+      if (response.status != 'new') {
+          item.remove();
+      }
+  });

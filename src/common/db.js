@@ -1,6 +1,17 @@
 var loki = require('lokijs');
+var gameOnTable = require('../game/onTable');
+var userOnTable = require('../user/onTable');
 
-var db = new loki('db/loki.json', {env: 'NODEJS', autosave: true, autosaveInterval: 4000, autoload: true});
+var db = new loki('db/loki.json', {
+    env: 'NODEJS',
+    autosave: true,
+    autosaveInterval: 4000,
+    autoload: true,
+    autoloadCallback: function () {
+        gameOnTable();
+        userOnTable();
+    }
+});
 
 exports.user = function () {
     return this.collection('user');

@@ -17,7 +17,7 @@ exports.index = function (request, response) {
 
     response.render('site/index', {
         users: userTable.findOnline(),
-        games: gameTable.findAll(),
+        games: gameTable.findOpen(),
         name: name,
         avatars: avatars
     });

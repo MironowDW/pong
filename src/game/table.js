@@ -23,8 +23,8 @@ exports.findById = function (id) {
     return wrap(db.game().get(id));
 };
 
-exports.findAll = function () {
-    var dbGames = db.game().find();
+exports.findOpen = function () {
+    var dbGames = db.game().find({status: 'new'});
     var games = [];
 
     for (var i in dbGames) {
@@ -32,6 +32,18 @@ exports.findAll = function () {
     }
 
     return games;
+};
+
+/**
+ * Помечает все игры в статусе full или go как server_error
+ */
+exports.markAsServerError = function () {
+    var games = db.game().find({status: {'$in': ['full', 'go']}});
+
+    for (var i in games) {
+        games[i].status = 'server_error';
+        db.game().update(games[i]);
+    }
 };
 
 exports.update = function (id, data) {
@@ -56,6 +68,7 @@ exports.update = function (id, data) {
     if (emit) {
         emitter.event('game.change', {
             id: game.id,
+            status: game.status,
             item: render.file('/game/user2-item.jade', {game: game})
         });
     }

@@ -29,6 +29,14 @@ exports.index = function (request, response) {
             hasAccess = false;
             message = 'Игра закончилась';
             break;
+        case 'server_error':
+            hasAccess = false;
+            message = 'Игра прервана сервером';
+            break;
+        case 'user_error':
+            hasAccess = false;
+            message = 'Игра прервана';
+            break;
     }
 
     if (!hasAccess) {
