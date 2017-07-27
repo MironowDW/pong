@@ -72,11 +72,11 @@ exports.update = function (id, data) {
         emit = true;
     }
 
-    if (data.socketId && data.socketId != dbUser.socketId) {
+    if (data.socketId != dbUser.socketId) {
         dbUser.socketId = data.socketId;
     }
 
-    db.user().update(dbUser);
+    var user = wrap(db.user().update(dbUser));
 
     if (emit) {
         emitter.event('user.changed', {
@@ -88,7 +88,7 @@ exports.update = function (id, data) {
         });
     }
 
-    return wrap(dbUser);
+    return user;
 };
 
 //////// TODO Тут ли место всему что ниже?
