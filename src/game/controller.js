@@ -35,7 +35,7 @@ exports.index = function (request, response) {
             break;
         case 'user_error':
             hasAccess = false;
-            message = 'Игра прервана';
+            message = 'Игра прервана игроком';
             break;
     }
 

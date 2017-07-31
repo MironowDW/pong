@@ -23,6 +23,10 @@ exports.findById = function (id) {
     return wrap(db.game().get(id));
 };
 
+exports.findNewUserGame = function (userId) {
+    return wrap(db.game().findOne({status: 'new', userId1: userId}));
+};
+
 exports.findOpen = function () {
     var dbGames = db.game().find({status: 'new'});
     var games = [];
@@ -32,6 +36,13 @@ exports.findOpen = function () {
     }
 
     return games;
+};
+
+exports.findUserActiveGames = function (userId) {
+    var userOr = [{userId1: userId}, {userId2: userId}];
+    var statusIn = ['new', 'full', 'go'];
+
+    return db.game().find({'$or': userOr, status: {'$in': statusIn}})
 };
 
 /**
@@ -101,6 +112,6 @@ function Game() {
         user2: function () {
             return this.userId2 ? userTable.findById(this.userId2) : {};
         },
-        status: 'new'
+        status: 'new' // new, full, go, end, server_error, user_error
     };
 }

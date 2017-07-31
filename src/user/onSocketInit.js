@@ -1,4 +1,5 @@
 var userTable = require('./table');
+var gameRunner = require('../game/runner');
 
 /**
  * При инициализации сокета текущего пользователя инициализируем события
@@ -28,6 +29,9 @@ module.exports = function (socket, hash) {
             if (user && user.socketId) {
                 return;
             }
+
+            // Отмечаем текущую игру пользователя как прерванную
+            gameRunner.onUserDisconnect(userId);
 
             userTable.update(user.id, {status: 'offline'});
         }, 5000);

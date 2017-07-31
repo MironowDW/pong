@@ -5,6 +5,7 @@ var userTable = require('../user/table');
 // TODO Как-то избавиться нужно
 exports.rooms = {};
 
+// TODO Прерывать игру по таймауту
 exports.run = function (game, io) {
     var user1 = userTable.findById(game.userId1);
     var user2 = userTable.findById(game.userId2);
@@ -15,6 +16,24 @@ exports.run = function (game, io) {
     room.start();
 
     this.rooms[game.id] = room;
+};
+
+// Удаляем все игры пользователя при потере коннекта
+exports.onUserDisconnect = function (userId) {
+    if (!userId) {
+        return;
+    }
+
+    var games = gameTable.findUserActiveGames(userId);
+    var room;
+
+    for (var i in games) {
+        room = this.rooms[games[i]['$loki']];
+
+        if (room) {
+            room.stop('user_error');
+        }
+    }
 };
 
 function Player(room, x, y) {
@@ -161,17 +180,23 @@ function Room(game, user1, user2, io) {
             this.tick();
         },
 
-        stop: function () {
+        stop: function (status) {
             this.emergencyBrake = true;
+            status = status || 'end';
 
-            // TODO
-            // game = module._update(game.id, {status: 'end'});
+            gameTable.update(game.id, {status: status});
         },
 
         tick: function () {
             if (this.emergencyBrake) {
                 return;
             }
+
+            // TODO Это нужно что бы при обновлении страницы пользователь подключался к игре, надо как-то по умнее сделать
+            user1 = userTable.findById(game.userId1);
+            user2 = userTable.findById(game.userId2);
+            this.socket1 = user1.socketId;
+            this.socket2 = user2.socketId;
 
             this.players[user1.id].update();
             this.players[user2.id].update();

@@ -28,6 +28,7 @@ block content
     script(type='text/javascript').
       var gameId = "#{game.id}";
       var isStarted = false;
+      var isInited = false;
 
       var sceneWidth = parseInt("#{config.width}");
       var sceneHeight = parseInt("#{config.height}");
@@ -61,6 +62,10 @@ block content
               return;
           }
 
+          if (response.status == 'user_error') {
+              alert('Игрок вышел');
+          }
+
           $("#user2-item").html(response.item);
       });
 
@@ -77,6 +82,10 @@ block content
       });
 
       global.on('t', function (state) {
+          if (!isInited) {
+              return;
+          }
+
           if (state.id != gameId) {
               return;
           }
@@ -136,6 +145,8 @@ block content
               });
 
               scene.register();
+
+              isInited = true;
           },
           render: function () {
               var canvas = document.createElement("canvas");
@@ -196,3 +207,7 @@ block content
       };
 
       window.onload = scene.init;
+
+//      window.onbeforeunload = function () {
+//          return false;//'Игра будет удалена';
+//      };

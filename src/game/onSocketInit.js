@@ -6,8 +6,11 @@ module.exports = function (socket, io) {
 
     socket.on('game.create', function (data, callback) {
         var user = userTable.findBySocketId(socket.id);
+        var game = gameTable.findNewUserGame(user.id);
 
-        game = gameTable.createGame(user);
+        if (!game) {
+            game = gameTable.createGame(user);
+        }
 
         callback(game);
     });
