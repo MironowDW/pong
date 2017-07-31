@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon --ignore 'db/' ./bin/www",
-    "prod": "./bin/www"
+    "start": "SOCKET_HOST=194.87.219.205 ./bin/www",
+    "dev": "nodemon --ignore 'db/' ./bin/www"
   },
   "dependencies": {
     "body-parser": "~1.13.2",
