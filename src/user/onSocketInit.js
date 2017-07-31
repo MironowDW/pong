@@ -12,9 +12,10 @@ module.exports = function (socket, hash) {
 
     socket.on('user.save', function (data) {
         var user = userTable.findBySocketId(socket.id);
-        userTable.update(user.id, data);
-
-        console.log('User saved', data);
+        if (user) {
+            userTable.update(user.id, data);
+            console.log('User saved', data);
+        }
     });
 
     socket.on('disconnect', function () {
