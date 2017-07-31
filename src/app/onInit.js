@@ -6,7 +6,7 @@ module.exports = function (io) {
     emitter.init(io);
 
     io.sockets.on('connection', function (socket) {
-        // Собитие после которого можно работать
+        // Событие после которого можно работать
         socket.on('user.init', function (hash, callback) {
             userOnSocketInit(socket, hash);
             gameOnSocketInit(socket, io);

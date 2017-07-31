@@ -35,7 +35,12 @@ exports.findByHash = function(hash) {
  * @returns {User}
  */
 exports.findBySocketId = function (socketId) {
-    return wrap(db.user().findOne({socketId: socketId}));
+    var user = wrap(db.user().findOne({socketId: socketId}));
+    if (!user) {
+        console.log('User not found by socket id: (' + socketId + ')');
+    }
+
+    return user;
 };
 
 exports.markOffline = function () {
@@ -57,22 +62,22 @@ exports.update = function (id, data) {
         throw 'Пользователь не найден';
     }
 
-    if (data.name && data.name != dbUser.name) {
+    if (data.name !== undefined) {
         dbUser.name = data.name;
         emit = true;
     }
 
-    if (data.avatar && data.avatar != dbUser.avatar) {
+    if (data.avatar !== undefined) {
         dbUser.avatar = data.avatar;
         emit = true;
     }
 
-    if (data.status && data.status != dbUser.status) {
+    if (data.status !== undefined) {
         dbUser.status = data.status;
         emit = true;
     }
 
-    if (data.socketId != dbUser.socketId) {
+    if (data.socketId !== undefined) {
         dbUser.socketId = data.socketId;
     }
 
@@ -84,7 +89,7 @@ exports.update = function (id, data) {
                 id: id,
                 status: dbUser.status
             },
-            'online-item': render.file('/user/online-item.jade', {user: dbUser})
+            'online-item': render.file('/user/online-item.jade', {user: user})
         });
     }
 
