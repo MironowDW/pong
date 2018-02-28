@@ -3,7 +3,7 @@
 var debug = require('debug')('pong:server');
 var http = require('http');
 
-var app = require('../app');
+var app = require('./../src/app');
 var port = parseInt(process.env.PORT || '8080');
 
 app.set('port', port);

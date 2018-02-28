@@ -27,13 +27,13 @@ io = io.listen(server);
 // Инициализируем приложение
 app.locals.socketHost = host;
 app.locals.socketPort = port;
-require('./src/app/onInit')(io);
+require('./app/onInit')(io);
 
 // Инициализация модуля пользователей
-app.use(require('./src/user/onRequest'));
+app.use(require('./user/onRequest'));
 
-app.get('/', require('./src/app/controller').index);
-app.get('/game/:id', require('./src/game/controller').index);
+app.get('/', require('./app/controller').index);
+app.get('/game/:id', require('./game/controller').index);
 
 // Обработка 404
 app.use(function(req, res, next) {
