@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "./console/server.js",
+    "server": "./console/server.js",
     "dev": "nodemon --ignore 'db/' ./console/server.js"
   },
   "dependencies": {
